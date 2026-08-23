@@ -8,7 +8,7 @@
                 <field name="frumecar_remision"/>
                 <field name="order_id"/>
                 <field name="name"/>
-                <field name="unit"/>
+                <field name="vehicle_id"/>
                 <field name="operator"/>
                 <field name="volume_m3"/>
                 <field name="date_load"/>
@@ -41,13 +41,16 @@
                             <field name="order_id"/>
                             <field name="design_id"/>
                             <field name="frumecar_remision"/>
-                            <field name="unit"/>
+                            <field name="vehicle_id"/>
                             <field name="operator"/>
                         </group>
                         <group>
                             <field name="olla"/>
                             <field name="volume_m3"/>
                             <field name="date_load"/>
+                            <field name="km_start"/>
+                            <field name="km_end"/>
+                            <field name="diesel_l"/>
                             <field name="out_of_tolerance" invisible="1"/>
                         </group>
                     </group>

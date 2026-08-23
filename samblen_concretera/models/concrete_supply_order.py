@@ -45,6 +45,9 @@ class ConcreteSupplyOrder(models.Model):
         ('cancel', 'Cancelado'),
     ], string='Estado', default='draft', tracking=True)
     company_id = fields.Many2one('res.company', default=lambda s: s.env.company)
+    sale_order_id = fields.Many2one('sale.order', string='Cotizacion',
+                                    readonly=True, copy=False)
+    olla_capacity = fields.Float(string='Capacidad por olla (m3)', default=7.0)
 
     @api.depends('delivery_ids')
     def _compute_delivery_count(self):
@@ -78,12 +81,33 @@ class ConcreteSupplyOrder(models.Model):
                 'y agendada para surtido.'))
         return True
 
+    def _generate_ollas(self):
+        """Divide la cantidad solicitada en ollas segun la capacidad."""
+        Delivery = self.env['concrete.delivery']
+        for rec in self:
+            cap = rec.olla_capacity or 7.0
+            remaining = rec.qty_m3 or 0.0
+            i = 0
+            while remaining > 0.001:
+                i += 1
+                vol = min(cap, remaining)
+                Delivery.create({
+                    'name': _('Olla %s') % i,
+                    'order_id': rec.id,
+                    'olla': i,
+                    'volume_m3': vol,
+                })
+                remaining -= vol
+
     def action_send_frumecar(self):
         for rec in self:
+            if not rec.delivery_ids:
+                rec._generate_ollas()
             rec.state = 'dosing'
             rec.message_post(body=_(
-                'Diseno de mezcla %s enviado a Frumecar (Odoo -> Frumecar).'
-            ) % (rec.design_id.name or ''))
+                'Diseno de mezcla %s enviado a Frumecar (Odoo -> Frumecar). '
+                'Ollas generadas: %s.'
+            ) % (rec.design_id.name or '', len(rec.delivery_ids)))
         return True
 
     def action_done(self):

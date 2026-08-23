@@ -1,6 +1,19 @@
 # -*- coding: utf-8 -*-
 from odoo import api, fields, models, _
 
+# Variacion simulada del dosificado real vs diseno, por clave de material.
+# Reproduce el escenario de la demo (cemento fuera de tolerancia).
+_SIM_VARIANCE = {
+    'CEM': 0.95238,      # -4.76%  -> fuera de +/-3%
+    'GRA-CAL': 1.0204,   # +2.04%
+    'GRA-VIL': 1.0,
+    'ARE-RIO': 1.0101,   # +1.01%
+    'ARE-TRI': 1.0101,   # +1.01%
+    'AGUA': 1.0,         # 0.00%
+    'IFO': 0.98810,      # -1.19%
+    'VIS': 1.0179,       # +1.79%
+}
+
 
 class ConcreteDelivery(models.Model):
     _name = 'concrete.delivery'
@@ -14,11 +27,15 @@ class ConcreteDelivery(models.Model):
     design_id = fields.Many2one(related='order_id.design_id', string='Diseno',
                                 readonly=True)
     olla = fields.Integer(string='No. olla', default=1)
-    unit = fields.Char(string='Unidad (CR)')
+    vehicle_id = fields.Many2one('fleet.vehicle', string='Olla / Unidad',
+                                 help='Unidad revolvedora del catalogo de Flota.')
     operator = fields.Char(string='Operador')
     volume_m3 = fields.Float(string='Volumen (m3)', default=7.0)
     frumecar_remision = fields.Char(string='Remision Frumecar', tracking=True)
     date_load = fields.Datetime(string='Fecha/Hora de carga')
+    km_start = fields.Float(string='Km inicial')
+    km_end = fields.Float(string='Km final')
+    diesel_l = fields.Float(string='Diesel (L)')
     state = fields.Selection([
         ('waiting', 'En espera'),
         ('dosed', 'Dosificada'),
@@ -37,13 +54,38 @@ class ConcreteDelivery(models.Model):
             rec.out_of_tolerance = bool(oot)
             rec.deviation_count = len(oot)
 
+    @api.onchange('vehicle_id')
+    def _onchange_vehicle_id(self):
+        for rec in self:
+            if rec.vehicle_id and rec.vehicle_id.driver_id:
+                rec.operator = rec.vehicle_id.driver_id.name
+
+    def _simulate_dosage(self):
+        """Genera el dosificado real a partir del diseno (simula Frumecar)
+        cuando la olla aun no tiene lineas de dosificado."""
+        Dosage = self.env['concrete.delivery.dosage']
+        for rec in self:
+            design = rec.order_id.design_id
+            if not design:
+                continue
+            for line in design.line_ids:
+                factor = _SIM_VARIANCE.get(line.material_id.code, 1.0)
+                qty = line.qty_per_m3 * (rec.volume_m3 or 0.0) * factor
+                Dosage.create({
+                    'delivery_id': rec.id,
+                    'material_id': line.material_id.id,
+                    'qty_real': round(qty, 3),
+                })
+
     def action_receive_remision(self):
-        """Simula la recepcion de la remision de Frumecar (en produccion lo
-        dispara el middleware conectado al puerto bidireccional)."""
+        """Simula la recepcion de la remision de Frumecar. En produccion lo
+        dispara el middleware conectado al puerto bidireccional."""
         for rec in self:
             if not rec.frumecar_remision:
                 rec.frumecar_remision = self.env['ir.sequence'].next_by_code(
                     'concrete.frumecar.remision') or ('FRM/%s' % rec.id)
+            if not rec.dosage_ids:
+                rec._simulate_dosage()
             rec.write({'state': 'dosed', 'date_load': fields.Datetime.now()})
             rec._notify_deviation()
             rec.order_id._update_progress()

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_concreto_fc250" model="product.template">
+        <field name="name">Concreto FC 250 - TMA 20 - Rev 14</field>
+        <field name="type">service</field>
+        <field name="list_price">1850.0</field>
+        <field name="is_concrete">1</field>
+        <field name="concrete_design_id" ref="design_fc250"/>
+        <field name="invoice_policy">order</field>
+    </record>
+
+    <record id="product_bombeo" model="product.template">
+        <field name="name">Servicio de bombeo de concreto</field>
+        <field name="type">service</field>
+        <field name="list_price">2400.0</field>
+        <field name="invoice_policy">order</field>
+    </record>
+</odoo>

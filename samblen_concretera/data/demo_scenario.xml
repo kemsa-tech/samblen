@@ -31,11 +31,14 @@
             <field name="name">Olla 1</field>
             <field name="order_id" ref="osc_22254"/>
             <field name="olla">1</field>
-            <field name="unit">CR-03</field>
+            <field name="vehicle_id" ref="veh_cr03"/>
             <field name="operator">Garcia Molina R.</field>
             <field name="volume_m3">7.0</field>
             <field name="frumecar_remision">FRM-8842</field>
             <field name="date_load">2026-03-30 09:12:00</field>
+            <field name="km_start">48250.0</field>
+            <field name="km_end">48286.0</field>
+            <field name="diesel_l">22.0</field>
             <field name="state">dosed</field>
         </record>
         <record id="dos1_cemento" model="concrete.delivery.dosage">
@@ -72,7 +75,7 @@
             <field name="name">Olla 2</field>
             <field name="order_id" ref="osc_22254"/>
             <field name="olla">2</field>
-            <field name="unit">CR-04</field>
+            <field name="vehicle_id" ref="veh_cr04"/>
             <field name="operator">Perez Luna J.</field>
             <field name="volume_m3">7.0</field>
             <field name="state">waiting</field>

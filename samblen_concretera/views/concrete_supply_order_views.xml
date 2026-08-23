@@ -56,6 +56,7 @@
                     <group>
                         <group>
                             <field name="partner_id"/>
+                            <field name="sale_order_id"/>
                             <field name="obra"/>
                             <field name="tipo"/>
                             <field name="design_id"/>
@@ -82,7 +83,7 @@
                                 <list decoration-danger="out_of_tolerance == True">
                                     <field name="name"/>
                                     <field name="frumecar_remision"/>
-                                    <field name="unit"/>
+                                    <field name="vehicle_id"/>
                                     <field name="operator"/>
                                     <field name="volume_m3"/>
                                     <field name="deviation_count" string="Desv."/>

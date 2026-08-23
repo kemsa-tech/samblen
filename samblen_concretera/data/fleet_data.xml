@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="brand_revolvedora" model="fleet.vehicle.model.brand">
+        <field name="name">Revolvedora</field>
+    </record>
+    <record id="model_olla7" model="fleet.vehicle.model">
+        <field name="name">Olla 7 m3</field>
+        <field name="brand_id" ref="brand_revolvedora"/>
+    </record>
+
+    <record id="veh_cr03" model="fleet.vehicle">
+        <field name="model_id" ref="model_olla7"/>
+        <field name="license_plate">CR-03</field>
+        <field name="is_olla">1</field>
+        <field name="capacity_m3">7.0</field>
+    </record>
+    <record id="veh_cr04" model="fleet.vehicle">
+        <field name="model_id" ref="model_olla7"/>
+        <field name="license_plate">CR-04</field>
+        <field name="is_olla">1</field>
+        <field name="capacity_m3">7.0</field>
+    </record>
+</odoo>

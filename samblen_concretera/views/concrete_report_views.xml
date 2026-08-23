@@ -10,7 +10,7 @@
                 <field name="frumecar_remision"/>
                 <field name="date_load"/>
                 <field name="order_id"/>
-                <field name="unit"/>
+                <field name="vehicle_id"/>
                 <field name="operator"/>
                 <field name="volume_m3" sum="Total m3"/>
                 <field name="deviation_count" string="Desv."/>

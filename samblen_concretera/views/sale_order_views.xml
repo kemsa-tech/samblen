@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_concrete" model="ir.ui.view">
+        <field name="name">sale.order.form.concrete</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button type="object" name="action_view_osc" class="oe_stat_button"
+                        icon="fa-truck" invisible="concrete_osc_count == 0">
+                    <field name="concrete_osc_count" widget="statinfo" string="OSC"/>
+                </button>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="action_generate_osc" type="object"
+                        string="Generar Orden de Surtimiento"
+                        invisible="state not in ('sale','done') or concrete_osc_count &gt; 0"/>
+            </xpath>
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="concrete_design_id"/>
+                <field name="concrete_obra"/>
+                <field name="concrete_distance_km"/>
+                <field name="concrete_tipo"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
