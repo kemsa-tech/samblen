@@ -82,8 +82,11 @@ class ConcreteSupplyOrder(models.Model):
         return True
 
     def _generate_ollas(self):
-        """Divide la cantidad solicitada en ollas segun la capacidad."""
+        """Divide la cantidad solicitada en ollas segun la capacidad y les
+        asigna una unidad de Flota y su operador de forma ciclica."""
         Delivery = self.env['concrete.delivery']
+        ollas = self.env['fleet.vehicle'].search(
+            [('is_olla', '=', True)], order='id')
         for rec in self:
             cap = rec.olla_capacity or 7.0
             remaining = rec.qty_m3 or 0.0
@@ -91,11 +94,15 @@ class ConcreteSupplyOrder(models.Model):
             while remaining > 0.001:
                 i += 1
                 vol = min(cap, remaining)
+                vehicle = ollas[(i - 1) % len(ollas)] if ollas else False
                 Delivery.create({
                     'name': _('Olla %s') % i,
                     'order_id': rec.id,
                     'olla': i,
                     'volume_m3': vol,
+                    'vehicle_id': vehicle.id if vehicle else False,
+                    'operator': (vehicle.driver_id.name
+                                 if vehicle and vehicle.driver_id else ''),
                 })
                 remaining -= vol
 

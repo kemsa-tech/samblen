@@ -8,16 +8,25 @@
         <field name="brand_id" ref="brand_revolvedora"/>
     </record>
 
+    <record id="driver_garcia" model="res.partner">
+        <field name="name">Garcia Molina R.</field>
+    </record>
+    <record id="driver_perez" model="res.partner">
+        <field name="name">Perez Luna J.</field>
+    </record>
+
     <record id="veh_cr03" model="fleet.vehicle">
         <field name="model_id" ref="model_olla7"/>
         <field name="license_plate">CR-03</field>
         <field name="is_olla">1</field>
         <field name="capacity_m3">7.0</field>
+        <field name="driver_id" ref="driver_garcia"/>
     </record>
     <record id="veh_cr04" model="fleet.vehicle">
         <field name="model_id" ref="model_olla7"/>
         <field name="license_plate">CR-04</field>
         <field name="is_olla">1</field>
         <field name="capacity_m3">7.0</field>
+        <field name="driver_id" ref="driver_perez"/>
     </record>
 </odoo>
