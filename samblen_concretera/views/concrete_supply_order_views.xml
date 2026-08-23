@@ -112,10 +112,9 @@
                 <filter name="f_draft" string="Solicitado" domain="[('state','=','draft')]"/>
                 <filter name="f_dosing" string="Dosificando" domain="[('state','=','dosing')]"/>
                 <filter name="f_done" string="Surtido" domain="[('state','=','done')]"/>
-                <group expand="0" string="Agrupar por">
-                    <filter name="g_state" string="Estado" context="{'group_by':'state'}"/>
-                    <filter name="g_partner" string="Cliente" context="{'group_by':'partner_id'}"/>
-                </group>
+                <separator/>
+                <filter name="g_state" string="Estado" context="{'group_by':'state'}"/>
+                <filter name="g_partner" string="Cliente" context="{'group_by':'partner_id'}"/>
             </search>
         </field>
     </record>
