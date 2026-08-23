@@ -15,4 +15,15 @@
         <field name="list_price">2400.0</field>
         <field name="invoice_policy">order</field>
     </record>
+
+    <!-- Flete: tarifas de EJEMPLO, ajustar con la cotizacion real de Samblen -->
+    <record id="product_flete" model="product.template">
+        <field name="name">Flete de concreto</field>
+        <field name="type">service</field>
+        <field name="list_price">0.0</field>
+        <field name="is_freight">1</field>
+        <field name="freight_base">0.0</field>
+        <field name="freight_per_km">45.0</field>
+        <field name="invoice_policy">order</field>
+    </record>
 </odoo>

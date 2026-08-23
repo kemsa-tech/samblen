@@ -53,6 +53,33 @@ class SaleOrder(models.Model):
             'state': 'released',
         })
 
+    def action_compute_freight(self):
+        """Calcula el flete por distancia y crea/actualiza la linea.
+        Tarifas de ejemplo en el producto 'Flete de concreto'; ajustar con
+        la cotizacion real de Samblen (por zona, por km, o incluido)."""
+        self.ensure_one()
+        tmpl = self.env.ref('samblen_concretera.product_flete',
+                            raise_if_not_found=False)
+        product = tmpl.product_variant_id if tmpl else False
+        if not product:
+            raise UserError(_('No se encontro el producto de flete.'))
+        amount = (tmpl.freight_base or 0.0) + \
+            (tmpl.freight_per_km or 0.0) * (self.concrete_distance_km or 0.0)
+        label = _('Flete de concreto (%.1f km)') % (self.concrete_distance_km or 0.0)
+        line = self.order_line.filtered(
+            lambda l: l.product_id == product)[:1]
+        if line:
+            line.write({'price_unit': amount, 'name': label,
+                        'product_uom_qty': 1.0})
+        else:
+            self.write({'order_line': [(0, 0, {
+                'product_id': product.id,
+                'name': label,
+                'product_uom_qty': 1.0,
+                'price_unit': amount,
+            })]})
+        return True
+
     def action_generate_osc(self):
         self.ensure_one()
         osc = self._create_osc()

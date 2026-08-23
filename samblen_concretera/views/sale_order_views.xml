@@ -12,6 +12,9 @@
                 </button>
             </xpath>
             <xpath expr="//header" position="inside">
+                <button name="action_compute_freight" type="object"
+                        string="Calcular flete"
+                        invisible="not concrete_distance_km"/>
                 <button name="action_generate_osc" type="object"
                         string="Generar Orden de Surtimiento"
                         invisible="state not in ('sale','done') or concrete_osc_count &gt; 0"/>
