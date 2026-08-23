@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ===== Configuracion de tarifa de flete ===== -->
+    <record id="view_freight_config_form" model="ir.ui.view">
+        <field name="name">product.template.freight.form</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <form string="Tarifa de flete">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group string="Regla de flete por distancia">
+                            <field name="freight_base"/>
+                            <field name="freight_per_km"/>
+                            <field name="freight_free_km"/>
+                        </group>
+                        <group string="Formula">
+                            <div colspan="2">
+                                <p>Flete = <b>base</b> + <b>$/km</b> x (distancia - <b>radio gratis</b>)</p>
+                                <p class="text-muted">Ejemplo: 0 + 45 x (18.4 - 5) = 603.00</p>
+                            </div>
+                        </group>
+                    </group>
+                    <field name="is_freight" invisible="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_freight_config_list" model="ir.ui.view">
+        <field name="name">product.template.freight.list</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <list string="Tarifas de flete">
+                <field name="name"/>
+                <field name="freight_base"/>
+                <field name="freight_per_km"/>
+                <field name="freight_free_km"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_freight_config" model="ir.actions.act_window">
+        <field name="name">Tarifa de flete</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_freight', '=', True)]</field>
+        <field name="context">{'default_is_freight': True}</field>
+        <field name="view_id" ref="view_freight_config_list"/>
+    </record>
+
+    <!-- ===== Existencias de materiales ===== -->
+    <record id="view_material_stock_list" model="ir.ui.view">
+        <field name="name">product.product.material.stock.list</field>
+        <field name="model">product.product</field>
+        <field name="arch" type="xml">
+            <list string="Existencias de materiales" create="false">
+                <field name="default_code" string="Clave"/>
+                <field name="name"/>
+                <field name="qty_available" string="Existencia"/>
+                <field name="uom_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_material_stock" model="ir.actions.act_window">
+        <field name="name">Existencias de materiales</field>
+        <field name="res_model">product.product</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('is_concrete_material', '=', True)]</field>
+        <field name="view_id" ref="view_material_stock_list"/>
+    </record>
+</odoo>

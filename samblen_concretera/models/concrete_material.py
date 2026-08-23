@@ -13,4 +13,7 @@ class ConcreteMaterial(models.Model):
     uom = fields.Selection(
         [('kg', 'kg'), ('l', 'L')],
         string='Unidad de medida', default='kg', required=True)
+    product_id = fields.Many2one(
+        'product.product', string='Producto almacenable',
+        help='Producto de inventario que representa este material.')
     active = fields.Boolean(default=True)

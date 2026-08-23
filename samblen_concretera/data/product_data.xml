@@ -24,6 +24,7 @@
         <field name="is_freight">1</field>
         <field name="freight_base">0.0</field>
         <field name="freight_per_km">45.0</field>
+        <field name="freight_free_km">5.0</field>
         <field name="invoice_policy">order</field>
     </record>
 </odoo>

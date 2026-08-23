@@ -28,4 +28,13 @@
     <menuitem id="menu_concretera_report_material" name="Consumo de material"
               parent="menu_concretera_reports" action="action_concrete_dosage"
               sequence="20"/>
+    <menuitem id="menu_concretera_material_stock" name="Existencias de materiales"
+              parent="menu_concretera_reports" action="action_material_stock"
+              sequence="30"/>
+
+    <menuitem id="menu_concretera_config" name="Configuracion"
+              parent="menu_concretera_root" sequence="90"/>
+    <menuitem id="menu_concretera_freight" name="Tarifa de flete"
+              parent="menu_concretera_config" action="action_freight_config"
+              sequence="10"/>
 </odoo>

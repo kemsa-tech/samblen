@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
+import logging
 from odoo import api, fields, models, _
+
+_logger = logging.getLogger(__name__)
 
 # Variacion simulada del dosificado real vs diseno, por clave de material.
 # Reproduce el escenario de la demo (cemento fuera de tolerancia).
@@ -46,6 +49,8 @@ class ConcreteDelivery(models.Model):
                                       compute='_compute_oot', store=True)
     deviation_count = fields.Integer(string='Desviaciones',
                                      compute='_compute_oot', store=True)
+    production_id = fields.Many2one('mrp.production',
+                                    string='Orden de fabricacion', readonly=True)
 
     @api.depends('dosage_ids.out_of_tolerance')
     def _compute_oot(self):
@@ -87,9 +92,59 @@ class ConcreteDelivery(models.Model):
             if not rec.dosage_ids:
                 rec._simulate_dosage()
             rec.write({'state': 'dosed', 'date_load': fields.Datetime.now()})
+            rec._consume_materials()
             rec._notify_deviation()
             rec.order_id._update_progress()
         return True
+
+    def _consume_materials(self):
+        """Genera una orden de fabricacion (MRP) que consume del almacen el
+        material REAL dosificado por Frumecar -> control de inventario nativo.
+        Defensivo: si MRP no puede cerrar la orden en esta instancia, se deja
+        confirmada y no se interrumpe el flujo de la demo."""
+        Production = self.env['mrp.production']
+        tmpl = self.env.ref('samblen_concretera.tmpl_concreto_prod',
+                            raise_if_not_found=False)
+        bom = self.env.ref('samblen_concretera.bom_fc250_prod',
+                           raise_if_not_found=False)
+        if not tmpl or not bom or not tmpl.product_variant_id:
+            return
+        for rec in self:
+            if rec.production_id:
+                continue
+            try:
+                mo = Production.create({
+                    'product_id': tmpl.product_variant_id.id,
+                    'product_qty': rec.volume_m3 or 1.0,
+                    'bom_id': bom.id,
+                    'origin': '%s / %s' % (rec.order_id.name, rec.name),
+                })
+                mo.action_confirm()
+                # Sustituir el consumo teorico por el dosificado REAL.
+                for move in mo.move_raw_ids:
+                    dline = rec.dosage_ids.filtered(
+                        lambda d: d.material_id.product_id == move.product_id)[:1]
+                    if dline:
+                        move.quantity = dline.qty_real
+                        move.picked = True
+                mo.qty_producing = rec.volume_m3 or 1.0
+                mo.with_context(skip_consumption=True,
+                                skip_backorder=True).button_mark_done()
+                rec.production_id = mo.id
+            except Exception as e:  # noqa: BLE001
+                _logger.warning('No se pudo cerrar la orden de fabricacion '
+                                'para %s: %s', rec.name, e)
+                if 'mo' in locals() and mo:
+                    rec.production_id = mo.id
+
+    def action_view_production(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'mrp.production',
+            'res_id': self.production_id.id,
+            'view_mode': 'form',
+        }
 
     def _notify_deviation(self):
         for rec in self:

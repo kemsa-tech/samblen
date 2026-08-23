@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- ============ Materiales como productos almacenables ============ -->
+    <record id="prod_cemento" model="product.product">
+        <field name="name">Cemento CPC 30R</field>
+        <field name="type">consu</field>
+        <field name="is_storable">1</field>
+        <field name="is_concrete_material">1</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+    </record>
+    <record id="prod_grava_calidra" model="product.product">
+        <field name="name">Grava 3/4" Calidra</field>
+        <field name="type">consu</field>
+        <field name="is_storable">1</field>
+        <field name="is_concrete_material">1</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+    </record>
+    <record id="prod_arena_rio" model="product.product">
+        <field name="name">Arena de rio</field>
+        <field name="type">consu</field>
+        <field name="is_storable">1</field>
+        <field name="is_concrete_material">1</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+    </record>
+    <record id="prod_arena_trit" model="product.product">
+        <field name="name">Arena triturada/lavada</field>
+        <field name="type">consu</field>
+        <field name="is_storable">1</field>
+        <field name="is_concrete_material">1</field>
+        <field name="uom_id" ref="uom.product_uom_kgm"/>
+        <field name="uom_po_id" ref="uom.product_uom_kgm"/>
+    </record>
+    <record id="prod_agua" model="product.product">
+        <field name="name">Agua</field>
+        <field name="type">consu</field>
+        <field name="is_storable">1</field>
+        <field name="is_concrete_material">1</field>
+        <field name="uom_id" ref="uom.product_uom_litre"/>
+        <field name="uom_po_id" ref="uom.product_uom_litre"/>
+    </record>
+    <record id="prod_ifoplast" model="product.product">
+        <field name="name">IFOPLAST</field>
+        <field name="type">consu</field>
+        <field name="is_storable">1</field>
+        <field name="is_concrete_material">1</field>
+        <field name="uom_id" ref="uom.product_uom_litre"/>
+        <field name="uom_po_id" ref="uom.product_uom_litre"/>
+    </record>
+    <record id="prod_viscoflow" model="product.product">
+        <field name="name">VISCOFLOW 8500</field>
+        <field name="type">consu</field>
+        <field name="is_storable">1</field>
+        <field name="is_concrete_material">1</field>
+        <field name="uom_id" ref="uom.product_uom_litre"/>
+        <field name="uom_po_id" ref="uom.product_uom_litre"/>
+    </record>
+
+    <!-- ============ Existencias iniciales (almacen) ============ -->
+    <record id="quant_cemento" model="stock.quant">
+        <field name="product_id" ref="prod_cemento"/>
+        <field name="location_id" ref="stock.stock_location_stock"/>
+        <field name="quantity">200000</field>
+    </record>
+    <record id="quant_grava_calidra" model="stock.quant">
+        <field name="product_id" ref="prod_grava_calidra"/>
+        <field name="location_id" ref="stock.stock_location_stock"/>
+        <field name="quantity">300000</field>
+    </record>
+    <record id="quant_arena_rio" model="stock.quant">
+        <field name="product_id" ref="prod_arena_rio"/>
+        <field name="location_id" ref="stock.stock_location_stock"/>
+        <field name="quantity">300000</field>
+    </record>
+    <record id="quant_arena_trit" model="stock.quant">
+        <field name="product_id" ref="prod_arena_trit"/>
+        <field name="location_id" ref="stock.stock_location_stock"/>
+        <field name="quantity">150000</field>
+    </record>
+    <record id="quant_agua" model="stock.quant">
+        <field name="product_id" ref="prod_agua"/>
+        <field name="location_id" ref="stock.stock_location_stock"/>
+        <field name="quantity">100000</field>
+    </record>
+    <record id="quant_ifoplast" model="stock.quant">
+        <field name="product_id" ref="prod_ifoplast"/>
+        <field name="location_id" ref="stock.stock_location_stock"/>
+        <field name="quantity">2000</field>
+    </record>
+    <record id="quant_viscoflow" model="stock.quant">
+        <field name="product_id" ref="prod_viscoflow"/>
+        <field name="location_id" ref="stock.stock_location_stock"/>
+        <field name="quantity">2000</field>
+    </record>
+
+    <!-- ============ Producto de produccion + BoM (diseno) ============ -->
+    <record id="tmpl_concreto_prod" model="product.template">
+        <field name="name">Concreto FC 250 (produccion)</field>
+        <field name="type">consu</field>
+        <field name="is_storable">1</field>
+        <field name="uom_id" ref="uom.product_uom_unit"/>
+        <field name="uom_po_id" ref="uom.product_uom_unit"/>
+        <field name="route_ids" eval="[(4, ref('mrp.route_warehouse0_manufacture'))]"/>
+    </record>
+
+    <record id="bom_fc250_prod" model="mrp.bom">
+        <field name="product_tmpl_id" ref="tmpl_concreto_prod"/>
+        <field name="product_qty">1.0</field>
+        <field name="type">normal</field>
+    </record>
+    <record id="bl_cemento" model="mrp.bom.line">
+        <field name="bom_id" ref="bom_fc250_prod"/>
+        <field name="product_id" ref="prod_cemento"/>
+        <field name="product_qty">300.0</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+    </record>
+    <record id="bl_calidra" model="mrp.bom.line">
+        <field name="bom_id" ref="bom_fc250_prod"/>
+        <field name="product_id" ref="prod_grava_calidra"/>
+        <field name="product_qty">700.0</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+    </record>
+    <record id="bl_arena_rio" model="mrp.bom.line">
+        <field name="bom_id" ref="bom_fc250_prod"/>
+        <field name="product_id" ref="prod_arena_rio"/>
+        <field name="product_qty">707.143</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+    </record>
+    <record id="bl_arena_trit" model="mrp.bom.line">
+        <field name="bom_id" ref="bom_fc250_prod"/>
+        <field name="product_id" ref="prod_arena_trit"/>
+        <field name="product_qty">282.857</field>
+        <field name="product_uom_id" ref="uom.product_uom_kgm"/>
+    </record>
+    <record id="bl_agua" model="mrp.bom.line">
+        <field name="bom_id" ref="bom_fc250_prod"/>
+        <field name="product_id" ref="prod_agua"/>
+        <field name="product_qty">190.0</field>
+        <field name="product_uom_id" ref="uom.product_uom_litre"/>
+    </record>
+    <record id="bl_ifoplast" model="mrp.bom.line">
+        <field name="bom_id" ref="bom_fc250_prod"/>
+        <field name="product_id" ref="prod_ifoplast"/>
+        <field name="product_qty">1.2</field>
+        <field name="product_uom_id" ref="uom.product_uom_litre"/>
+    </record>
+    <record id="bl_viscoflow" model="mrp.bom.line">
+        <field name="bom_id" ref="bom_fc250_prod"/>
+        <field name="product_id" ref="prod_viscoflow"/>
+        <field name="product_qty">0.8</field>
+        <field name="product_uom_id" ref="uom.product_uom_litre"/>
+    </record>
+
+    <!-- ============ Enlace material (diseno) -> producto ============ -->
+    <record id="mat_cemento" model="concrete.material">
+        <field name="product_id" ref="prod_cemento"/></record>
+    <record id="mat_grava_calidra" model="concrete.material">
+        <field name="product_id" ref="prod_grava_calidra"/></record>
+    <record id="mat_arena_rio" model="concrete.material">
+        <field name="product_id" ref="prod_arena_rio"/></record>
+    <record id="mat_arena_trit" model="concrete.material">
+        <field name="product_id" ref="prod_arena_trit"/></record>
+    <record id="mat_agua" model="concrete.material">
+        <field name="product_id" ref="prod_agua"/></record>
+    <record id="mat_ifoplast" model="concrete.material">
+        <field name="product_id" ref="prod_ifoplast"/></record>
+    <record id="mat_viscoflow" model="concrete.material">
+        <field name="product_id" ref="prod_viscoflow"/></record>
+</odoo>

@@ -63,8 +63,10 @@ class SaleOrder(models.Model):
         product = tmpl.product_variant_id if tmpl else False
         if not product:
             raise UserError(_('No se encontro el producto de flete.'))
+        billable_km = max(0.0, (self.concrete_distance_km or 0.0)
+                          - (tmpl.freight_free_km or 0.0))
         amount = (tmpl.freight_base or 0.0) + \
-            (tmpl.freight_per_km or 0.0) * (self.concrete_distance_km or 0.0)
+            (tmpl.freight_per_km or 0.0) * billable_km
         label = _('Flete de concreto (%.1f km)') % (self.concrete_distance_km or 0.0)
         line = self.order_line.filtered(
             lambda l: l.product_id == product)[:1]
