@@ -7,7 +7,6 @@
         <field name="is_storable">1</field>
         <field name="is_concrete_material">1</field>
         <field name="uom_id" ref="uom.product_uom_kgm"/>
-        <field name="uom_po_id" ref="uom.product_uom_kgm"/>
     </record>
     <record id="prod_grava_calidra" model="product.product">
         <field name="name">Grava 3/4" Calidra</field>
@@ -15,7 +14,6 @@
         <field name="is_storable">1</field>
         <field name="is_concrete_material">1</field>
         <field name="uom_id" ref="uom.product_uom_kgm"/>
-        <field name="uom_po_id" ref="uom.product_uom_kgm"/>
     </record>
     <record id="prod_arena_rio" model="product.product">
         <field name="name">Arena de rio</field>
@@ -23,7 +21,6 @@
         <field name="is_storable">1</field>
         <field name="is_concrete_material">1</field>
         <field name="uom_id" ref="uom.product_uom_kgm"/>
-        <field name="uom_po_id" ref="uom.product_uom_kgm"/>
     </record>
     <record id="prod_arena_trit" model="product.product">
         <field name="name">Arena triturada/lavada</field>
@@ -31,7 +28,6 @@
         <field name="is_storable">1</field>
         <field name="is_concrete_material">1</field>
         <field name="uom_id" ref="uom.product_uom_kgm"/>
-        <field name="uom_po_id" ref="uom.product_uom_kgm"/>
     </record>
     <record id="prod_agua" model="product.product">
         <field name="name">Agua</field>
@@ -39,7 +35,6 @@
         <field name="is_storable">1</field>
         <field name="is_concrete_material">1</field>
         <field name="uom_id" ref="uom.product_uom_litre"/>
-        <field name="uom_po_id" ref="uom.product_uom_litre"/>
     </record>
     <record id="prod_ifoplast" model="product.product">
         <field name="name">IFOPLAST</field>
@@ -47,7 +42,6 @@
         <field name="is_storable">1</field>
         <field name="is_concrete_material">1</field>
         <field name="uom_id" ref="uom.product_uom_litre"/>
-        <field name="uom_po_id" ref="uom.product_uom_litre"/>
     </record>
     <record id="prod_viscoflow" model="product.product">
         <field name="name">VISCOFLOW 8500</field>
@@ -55,7 +49,6 @@
         <field name="is_storable">1</field>
         <field name="is_concrete_material">1</field>
         <field name="uom_id" ref="uom.product_uom_litre"/>
-        <field name="uom_po_id" ref="uom.product_uom_litre"/>
     </record>
 
     <!-- ============ Existencias iniciales (almacen) ============ -->
@@ -101,7 +94,6 @@
         <field name="type">consu</field>
         <field name="is_storable">1</field>
         <field name="uom_id" ref="uom.product_uom_unit"/>
-        <field name="uom_po_id" ref="uom.product_uom_unit"/>
         <field name="route_ids" eval="[(4, ref('mrp.route_warehouse0_manufacture'))]"/>
     </record>
 
