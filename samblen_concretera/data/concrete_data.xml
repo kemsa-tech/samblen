@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Materiales -->
+    <record id="mat_cemento" model="concrete.material">
+        <field name="name">Cemento CPC 30R</field>
+        <field name="code">CEM</field><field name="sequence">10</field>
+        <field name="uom">kg</field>
+    </record>
+    <record id="mat_grava_calidra" model="concrete.material">
+        <field name="name">Grava 3/4" Calidra</field>
+        <field name="code">GRA-CAL</field><field name="sequence">20</field>
+        <field name="uom">kg</field>
+    </record>
+    <record id="mat_grava_villalba" model="concrete.material">
+        <field name="name">Grava 3/4" Villalba</field>
+        <field name="code">GRA-VIL</field><field name="sequence">30</field>
+        <field name="uom">kg</field>
+    </record>
+    <record id="mat_arena_rio" model="concrete.material">
+        <field name="name">Arena de rio</field>
+        <field name="code">ARE-RIO</field><field name="sequence">40</field>
+        <field name="uom">kg</field>
+    </record>
+    <record id="mat_arena_trit" model="concrete.material">
+        <field name="name">Arena triturada/lavada</field>
+        <field name="code">ARE-TRI</field><field name="sequence">50</field>
+        <field name="uom">kg</field>
+    </record>
+    <record id="mat_agua" model="concrete.material">
+        <field name="name">Agua</field>
+        <field name="code">AGUA</field><field name="sequence">60</field>
+        <field name="uom">l</field>
+    </record>
+    <record id="mat_ifoplast" model="concrete.material">
+        <field name="name">IFOPLAST</field>
+        <field name="code">IFO</field><field name="sequence">70</field>
+        <field name="uom">l</field>
+    </record>
+    <record id="mat_viscoflow" model="concrete.material">
+        <field name="name">VISCOFLOW 8500</field>
+        <field name="code">VIS</field><field name="sequence">80</field>
+        <field name="uom">l</field>
+    </record>
+
+    <!-- Diseno de mezcla FC 250 -->
+    <record id="design_fc250" model="concrete.mix.design">
+        <field name="name">D-FC250-20</field>
+        <field name="resistance">250 kg/cm2</field>
+        <field name="tma">20 mm</field>
+        <field name="revenimiento">14 cm</field>
+        <field name="tolerance">3.0</field>
+    </record>
+    <record id="dl_fc250_cemento" model="concrete.mix.design.line">
+        <field name="design_id" ref="design_fc250"/>
+        <field name="material_id" ref="mat_cemento"/>
+        <field name="qty_per_m3">300.0</field>
+    </record>
+    <record id="dl_fc250_calidra" model="concrete.mix.design.line">
+        <field name="design_id" ref="design_fc250"/>
+        <field name="material_id" ref="mat_grava_calidra"/>
+        <field name="qty_per_m3">700.0</field>
+    </record>
+    <record id="dl_fc250_arena_rio" model="concrete.mix.design.line">
+        <field name="design_id" ref="design_fc250"/>
+        <field name="material_id" ref="mat_arena_rio"/>
+        <field name="qty_per_m3">707.143</field>
+    </record>
+    <record id="dl_fc250_arena_trit" model="concrete.mix.design.line">
+        <field name="design_id" ref="design_fc250"/>
+        <field name="material_id" ref="mat_arena_trit"/>
+        <field name="qty_per_m3">282.857</field>
+    </record>
+    <record id="dl_fc250_agua" model="concrete.mix.design.line">
+        <field name="design_id" ref="design_fc250"/>
+        <field name="material_id" ref="mat_agua"/>
+        <field name="qty_per_m3">190.0</field>
+    </record>
+    <record id="dl_fc250_ifoplast" model="concrete.mix.design.line">
+        <field name="design_id" ref="design_fc250"/>
+        <field name="material_id" ref="mat_ifoplast"/>
+        <field name="qty_per_m3">1.2</field>
+    </record>
+    <record id="dl_fc250_viscoflow" model="concrete.mix.design.line">
+        <field name="design_id" ref="design_fc250"/>
+        <field name="material_id" ref="mat_viscoflow"/>
+        <field name="qty_per_m3">0.8</field>
+    </record>
+</odoo>

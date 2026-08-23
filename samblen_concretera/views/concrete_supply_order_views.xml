@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_concrete_supply_order_list" model="ir.ui.view">
+        <field name="name">concrete.supply.order.list</field>
+        <field name="model">concrete.supply.order</field>
+        <field name="arch" type="xml">
+            <list string="Ordenes de Surtimiento" decoration-danger="deviation_alert == True">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="obra"/>
+                <field name="design_id"/>
+                <field name="qty_m3"/>
+                <field name="qty_delivered"/>
+                <field name="deviation_alert" string="Desv." widget="boolean_toggle"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'done'"
+                       decoration-warning="state == 'partial'"
+                       decoration-info="state in ('released','dosing')"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_concrete_supply_order_form" model="ir.ui.view">
+        <field name="name">concrete.supply.order.form</field>
+        <field name="model">concrete.supply.order</field>
+        <field name="arch" type="xml">
+            <form string="Orden de Surtimiento de Concreto">
+                <header>
+                    <button name="action_release" type="object" string="Liberar"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_send_frumecar" type="object"
+                            string="Enviar diseno a Frumecar" class="btn-primary"
+                            invisible="state != 'released'"/>
+                    <button name="action_done" type="object" string="Marcar surtido"
+                            invisible="state not in ('dosing','partial')"/>
+                    <button name="action_cancel" type="object" string="Cancelar"
+                            invisible="state in ('done','cancel')"/>
+                    <button name="action_draft" type="object" string="Restablecer"
+                            invisible="state != 'cancel'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,released,dosing,partial,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" icon="fa-truck" type="object"
+                                name="action_view_deliveries">
+                            <field name="delivery_count" widget="statinfo" string="Ollas"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Desviacion"
+                            bg_color="text-bg-danger" invisible="not deviation_alert"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="obra"/>
+                            <field name="tipo"/>
+                            <field name="design_id"/>
+                            <field name="resistance"/>
+                            <field name="tma"/>
+                            <field name="revenimiento"/>
+                        </group>
+                        <group>
+                            <field name="qty_m3"/>
+                            <field name="qty_delivered"/>
+                            <field name="qty_pending"/>
+                            <field name="distance_km"/>
+                            <field name="date_order"/>
+                            <field name="deviation_alert" invisible="1"/>
+                        </group>
+                    </group>
+                    <group string="Ubicaciones">
+                        <field name="origin"/>
+                        <field name="destination"/>
+                    </group>
+                    <notebook>
+                        <page string="Vehiculos / Ollas">
+                            <field name="delivery_ids">
+                                <list decoration-danger="out_of_tolerance == True">
+                                    <field name="name"/>
+                                    <field name="frumecar_remision"/>
+                                    <field name="unit"/>
+                                    <field name="operator"/>
+                                    <field name="volume_m3"/>
+                                    <field name="deviation_count" string="Desv."/>
+                                    <field name="state" widget="badge"
+                                           decoration-success="state == 'dosed'"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_concrete_supply_order_search" model="ir.ui.view">
+        <field name="name">concrete.supply.order.search</field>
+        <field name="model">concrete.supply.order</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="obra"/>
+                <filter name="f_dev" string="Con desviacion"
+                        domain="[('deviation_alert','=',True)]"/>
+                <separator/>
+                <filter name="f_draft" string="Solicitado" domain="[('state','=','draft')]"/>
+                <filter name="f_dosing" string="Dosificando" domain="[('state','=','dosing')]"/>
+                <filter name="f_done" string="Surtido" domain="[('state','=','done')]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter name="g_state" string="Estado" context="{'group_by':'state'}"/>
+                    <filter name="g_partner" string="Cliente" context="{'group_by':'partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_concrete_supply_order" model="ir.actions.act_window">
+        <field name="name">Ordenes de Surtimiento</field>
+        <field name="res_model">concrete.supply.order</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_concrete_supply_order_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Crea una orden de surtimiento de concreto</p>
+        </field>
+    </record>
+</odoo>

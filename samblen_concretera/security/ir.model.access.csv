@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_concrete_material_user,concrete.material user,model_concrete_material,base.group_user,1,1,1,1
+access_concrete_mix_design_user,concrete.mix.design user,model_concrete_mix_design,base.group_user,1,1,1,1
+access_concrete_mix_design_line_user,concrete.mix.design.line user,model_concrete_mix_design_line,base.group_user,1,1,1,1
+access_concrete_supply_order_user,concrete.supply.order user,model_concrete_supply_order,base.group_user,1,1,1,1
+access_concrete_delivery_user,concrete.delivery user,model_concrete_delivery,base.group_user,1,1,1,1
+access_concrete_delivery_dosage_user,concrete.delivery.dosage user,model_concrete_delivery_dosage,base.group_user,1,1,1,1

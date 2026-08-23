@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Cliente de ejemplo -->
+        <record id="partner_hernandez" model="res.partner">
+            <field name="name">Hernandez Viveros Elia</field>
+            <field name="company_type">person</field>
+            <field name="city">Cholula</field>
+            <field name="country_id" ref="base.mx"/>
+        </record>
+
+        <!-- Orden de Surtimiento de Concreto -->
+        <record id="osc_22254" model="concrete.supply.order">
+            <field name="name">OSC/22254</field>
+            <field name="partner_id" ref="partner_hernandez"/>
+            <field name="obra">Casa habitacion - La Calera</field>
+            <field name="tipo">externo</field>
+            <field name="design_id" ref="design_fc250"/>
+            <field name="resistance">250 kg/cm2</field>
+            <field name="tma">20 mm</field>
+            <field name="revenimiento">14 cm</field>
+            <field name="distance_km">18.4</field>
+            <field name="qty_m3">14.0</field>
+            <field name="origin">Planta - Carr. Federal Puebla-Atlixco KM 20, Sta. Isabel Cholula</field>
+            <field name="destination">La Calera - Mirador La Calera, C.P. 72520</field>
+            <field name="state">dosing</field>
+        </record>
+
+        <!-- Olla 1: dosificada, con desviacion en cemento -->
+        <record id="del_olla1" model="concrete.delivery">
+            <field name="name">Olla 1</field>
+            <field name="order_id" ref="osc_22254"/>
+            <field name="olla">1</field>
+            <field name="unit">CR-03</field>
+            <field name="operator">Garcia Molina R.</field>
+            <field name="volume_m3">7.0</field>
+            <field name="frumecar_remision">FRM-8842</field>
+            <field name="date_load">2026-03-30 09:12:00</field>
+            <field name="state">dosed</field>
+        </record>
+        <record id="dos1_cemento" model="concrete.delivery.dosage">
+            <field name="delivery_id" ref="del_olla1"/>
+            <field name="material_id" ref="mat_cemento"/><field name="qty_real">2000.0</field>
+        </record>
+        <record id="dos1_calidra" model="concrete.delivery.dosage">
+            <field name="delivery_id" ref="del_olla1"/>
+            <field name="material_id" ref="mat_grava_calidra"/><field name="qty_real">5000.0</field>
+        </record>
+        <record id="dos1_arena_rio" model="concrete.delivery.dosage">
+            <field name="delivery_id" ref="del_olla1"/>
+            <field name="material_id" ref="mat_arena_rio"/><field name="qty_real">5000.0</field>
+        </record>
+        <record id="dos1_arena_trit" model="concrete.delivery.dosage">
+            <field name="delivery_id" ref="del_olla1"/>
+            <field name="material_id" ref="mat_arena_trit"/><field name="qty_real">2000.0</field>
+        </record>
+        <record id="dos1_agua" model="concrete.delivery.dosage">
+            <field name="delivery_id" ref="del_olla1"/>
+            <field name="material_id" ref="mat_agua"/><field name="qty_real">1330.0</field>
+        </record>
+        <record id="dos1_ifoplast" model="concrete.delivery.dosage">
+            <field name="delivery_id" ref="del_olla1"/>
+            <field name="material_id" ref="mat_ifoplast"/><field name="qty_real">8.3</field>
+        </record>
+        <record id="dos1_viscoflow" model="concrete.delivery.dosage">
+            <field name="delivery_id" ref="del_olla1"/>
+            <field name="material_id" ref="mat_viscoflow"/><field name="qty_real">5.7</field>
+        </record>
+
+        <!-- Olla 2: en espera de remision -->
+        <record id="del_olla2" model="concrete.delivery">
+            <field name="name">Olla 2</field>
+            <field name="order_id" ref="osc_22254"/>
+            <field name="olla">2</field>
+            <field name="unit">CR-04</field>
+            <field name="operator">Perez Luna J.</field>
+            <field name="volume_m3">7.0</field>
+            <field name="state">waiting</field>
+        </record>
+        <record id="dos2_cemento" model="concrete.delivery.dosage">
+            <field name="delivery_id" ref="del_olla2"/>
+            <field name="material_id" ref="mat_cemento"/><field name="qty_real">2085.0</field>
+        </record>
+        <record id="dos2_calidra" model="concrete.delivery.dosage">
+            <field name="delivery_id" ref="del_olla2"/>
+            <field name="material_id" ref="mat_grava_calidra"/><field name="qty_real">4930.0</field>
+        </record>
+        <record id="dos2_arena_rio" model="concrete.delivery.dosage">
+            <field name="delivery_id" ref="del_olla2"/>
+            <field name="material_id" ref="mat_arena_rio"/><field name="qty_real">4980.0</field>
+        </record>
+        <record id="dos2_arena_trit" model="concrete.delivery.dosage">
+            <field name="delivery_id" ref="del_olla2"/>
+            <field name="material_id" ref="mat_arena_trit"/><field name="qty_real">1990.0</field>
+        </record>
+        <record id="dos2_agua" model="concrete.delivery.dosage">
+            <field name="delivery_id" ref="del_olla2"/>
+            <field name="material_id" ref="mat_agua"/><field name="qty_real">1325.0</field>
+        </record>
+        <record id="dos2_ifoplast" model="concrete.delivery.dosage">
+            <field name="delivery_id" ref="del_olla2"/>
+            <field name="material_id" ref="mat_ifoplast"/><field name="qty_real">8.4</field>
+        </record>
+        <record id="dos2_viscoflow" model="concrete.delivery.dosage">
+            <field name="delivery_id" ref="del_olla2"/>
+            <field name="material_id" ref="mat_viscoflow"/><field name="qty_real">5.6</field>
+        </record>
+    </data>
+</odoo>

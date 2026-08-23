@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_concretera_root" name="Concretera"
+              web_icon="samblen_concretera,static/description/icon.png"
+              sequence="15"/>
+
+    <menuitem id="menu_concretera_osc" name="Ordenes de Surtimiento"
+              parent="menu_concretera_root" action="action_concrete_supply_order"
+              sequence="10"/>
+
+    <menuitem id="menu_concretera_prod" name="Produccion"
+              parent="menu_concretera_root" sequence="20"/>
+    <menuitem id="menu_concretera_designs" name="Disenos de mezcla"
+              parent="menu_concretera_prod" action="action_concrete_mix_design"
+              sequence="10"/>
+    <menuitem id="menu_concretera_materials" name="Materiales"
+              parent="menu_concretera_prod" action="action_concrete_material"
+              sequence="20"/>
+    <menuitem id="menu_concretera_deliveries" name="Remisiones"
+              parent="menu_concretera_prod" action="action_concrete_delivery"
+              sequence="30"/>
+
+    <menuitem id="menu_concretera_reports" name="Reportes"
+              parent="menu_concretera_root" sequence="30"/>
+    <menuitem id="menu_concretera_report_main" name="Reporte Concretera"
+              parent="menu_concretera_reports" action="action_concrete_report"
+              sequence="10"/>
+    <menuitem id="menu_concretera_report_material" name="Consumo de material"
+              parent="menu_concretera_reports" action="action_concrete_dosage"
+              sequence="20"/>
+</odoo>

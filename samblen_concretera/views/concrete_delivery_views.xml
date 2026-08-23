@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_concrete_delivery_list" model="ir.ui.view">
+        <field name="name">concrete.delivery.list</field>
+        <field name="model">concrete.delivery</field>
+        <field name="arch" type="xml">
+            <list string="Remisiones / Ollas" decoration-danger="out_of_tolerance == True">
+                <field name="frumecar_remision"/>
+                <field name="order_id"/>
+                <field name="name"/>
+                <field name="unit"/>
+                <field name="operator"/>
+                <field name="volume_m3"/>
+                <field name="date_load"/>
+                <field name="deviation_count" string="Desv."/>
+                <field name="out_of_tolerance" string="Fuera tol." widget="boolean_toggle"/>
+                <field name="state" widget="badge" decoration-success="state == 'dosed'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_concrete_delivery_form" model="ir.ui.view">
+        <field name="name">concrete.delivery.form</field>
+        <field name="model">concrete.delivery</field>
+        <field name="arch" type="xml">
+            <form string="Remision / Olla">
+                <header>
+                    <button name="action_receive_remision" type="object"
+                            string="Recibir remision (Frumecar)" class="btn-primary"
+                            invisible="state != 'waiting'"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Fuera de tolerancia"
+                            bg_color="text-bg-danger" invisible="not out_of_tolerance"/>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="order_id"/>
+                            <field name="design_id"/>
+                            <field name="frumecar_remision"/>
+                            <field name="unit"/>
+                            <field name="operator"/>
+                        </group>
+                        <group>
+                            <field name="olla"/>
+                            <field name="volume_m3"/>
+                            <field name="date_load"/>
+                            <field name="out_of_tolerance" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Dosificado real vs Diseno">
+                            <field name="dosage_ids">
+                                <list editable="bottom" decoration-danger="out_of_tolerance == True">
+                                    <field name="material_id"/>
+                                    <field name="qty_design"/>
+                                    <field name="qty_real"/>
+                                    <field name="deviation"/>
+                                    <field name="uom"/>
+                                    <field name="out_of_tolerance" string="Fuera tol."/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_concrete_delivery" model="ir.actions.act_window">
+        <field name="name">Remisiones</field>
+        <field name="res_model">concrete.delivery</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>
