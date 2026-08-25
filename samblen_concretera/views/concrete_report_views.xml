@@ -104,6 +104,55 @@
         <field name="context">{'search_default_out_of_tolerance': 1}</field>
     </record>
 
+    <!-- ===== Graficos para tablero de oficina central ===== -->
+    <record id="view_delivery_graph_vol" model="ir.ui.view">
+        <field name="name">concrete.delivery.graph.vol</field>
+        <field name="model">concrete.delivery</field>
+        <field name="arch" type="xml">
+            <graph string="m3 surtidos" type="line" sample="1">
+                <field name="date_load" interval="day"/>
+                <field name="volume_m3" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_delivery_graph_dev" model="ir.ui.view">
+        <field name="name">concrete.delivery.graph.dev</field>
+        <field name="model">concrete.delivery</field>
+        <field name="arch" type="xml">
+            <graph string="Desviaciones por diseno" type="bar" sample="1">
+                <field name="design_id"/>
+                <field name="deviation_count" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="action_dash_surtido" model="ir.actions.act_window">
+        <field name="name">m3 surtidos por dia</field>
+        <field name="res_model">concrete.delivery</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="domain">[('state', '=', 'dosed')]</field>
+    </record>
+    <record id="act_surtido_graph" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_delivery_graph_vol"/>
+        <field name="act_window_id" ref="action_dash_surtido"/>
+    </record>
+
+    <record id="action_dash_dev_design" model="ir.actions.act_window">
+        <field name="name">Desviaciones por diseno</field>
+        <field name="res_model">concrete.delivery</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="domain">[('out_of_tolerance', '=', True)]</field>
+    </record>
+    <record id="act_dev_design_graph" model="ir.actions.act_window.view">
+        <field name="sequence">1</field>
+        <field name="view_mode">graph</field>
+        <field name="view_id" ref="view_delivery_graph_dev"/>
+        <field name="act_window_id" ref="action_dash_dev_design"/>
+    </record>
+
     <record id="view_concrete_dosage_search" model="ir.ui.view">
         <field name="name">concrete.delivery.dosage.search</field>
         <field name="model">concrete.delivery.dosage</field>

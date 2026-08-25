@@ -34,6 +34,12 @@
     <menuitem id="menu_concretera_dev_dashboard" name="Tablero de desviaciones"
               parent="menu_concretera_reports" action="action_deviation_dashboard"
               sequence="5"/>
+    <menuitem id="menu_concretera_dash_surtido" name="m3 surtidos por dia"
+              parent="menu_concretera_reports" action="action_dash_surtido"
+              sequence="6"/>
+    <menuitem id="menu_concretera_dash_dev_design" name="Desviaciones por diseno"
+              parent="menu_concretera_reports" action="action_dash_dev_design"
+              sequence="7"/>
 
     <menuitem id="menu_concretera_config" name="Configuracion"
               parent="menu_concretera_root" sequence="90"/>
