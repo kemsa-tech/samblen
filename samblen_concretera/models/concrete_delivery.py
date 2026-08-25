@@ -28,7 +28,7 @@ class ConcreteDelivery(models.Model):
     order_id = fields.Many2one('concrete.supply.order', string='Orden',
                                required=True, ondelete='cascade', tracking=True)
     design_id = fields.Many2one(related='order_id.design_id', string='Diseño',
-                                readonly=True, store=True)
+                                readonly=True)
     olla = fields.Integer(string='No. olla', default=1)
     vehicle_id = fields.Many2one('fleet.vehicle', string='Olla / Unidad',
                                  help='Unidad revolvedora del catalogo de Flota.')

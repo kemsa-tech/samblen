@@ -117,12 +117,11 @@
     </record>
 
     <record id="view_delivery_graph_dev" model="ir.ui.view">
-        <field name="name">concrete.delivery.graph.dev</field>
-        <field name="model">concrete.delivery</field>
+        <field name="name">concrete.supply.order.graph.dev</field>
+        <field name="model">concrete.supply.order</field>
         <field name="arch" type="xml">
             <graph string="Desviaciones por diseño" type="bar" sample="1">
                 <field name="design_id"/>
-                <field name="deviation_count" type="measure"/>
             </graph>
         </field>
     </record>
@@ -142,9 +141,9 @@
 
     <record id="action_dash_dev_design" model="ir.actions.act_window">
         <field name="name">Desviaciones por diseño</field>
-        <field name="res_model">concrete.delivery</field>
-        <field name="view_mode">graph,pivot,list</field>
-        <field name="domain">[('out_of_tolerance', '=', True)]</field>
+        <field name="res_model">concrete.supply.order</field>
+        <field name="view_mode">graph,list,form</field>
+        <field name="domain">[('deviation_alert', '=', True)]</field>
     </record>
     <record id="act_dev_design_graph" model="ir.actions.act_window.view">
         <field name="sequence">1</field>
