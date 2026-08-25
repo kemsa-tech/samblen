@@ -31,6 +31,9 @@
     <menuitem id="menu_concretera_material_stock" name="Existencias de materiales"
               parent="menu_concretera_reports" action="action_material_stock"
               sequence="30"/>
+    <menuitem id="menu_concretera_dev_dashboard" name="Tablero de desviaciones"
+              parent="menu_concretera_reports" action="action_deviation_dashboard"
+              sequence="5"/>
 
     <menuitem id="menu_concretera_config" name="Configuracion"
               parent="menu_concretera_root" sequence="90"/>

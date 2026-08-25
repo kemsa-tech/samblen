@@ -70,6 +70,55 @@
     <record id="action_concrete_dosage" model="ir.actions.act_window">
         <field name="name">Consumo de material</field>
         <field name="res_model">concrete.delivery.dosage</field>
-        <field name="view_mode">pivot,list</field>
+        <field name="view_mode">pivot,list,graph</field>
+    </record>
+
+    <!-- ===== Tablero de desviaciones (grafico + pivote) ===== -->
+    <record id="view_concrete_dosage_graph" model="ir.ui.view">
+        <field name="name">concrete.delivery.dosage.graph</field>
+        <field name="model">concrete.delivery.dosage</field>
+        <field name="arch" type="xml">
+            <graph string="Desviaciones" type="bar" sample="1">
+                <field name="material_id"/>
+                <field name="deviation" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_concrete_dosage_dash_pivot" model="ir.ui.view">
+        <field name="name">concrete.delivery.dosage.dash.pivot</field>
+        <field name="model">concrete.delivery.dosage</field>
+        <field name="arch" type="xml">
+            <pivot string="Desviaciones">
+                <field name="order_id" type="row"/>
+                <field name="material_id" type="col"/>
+                <field name="deviation" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_deviation_dashboard" model="ir.actions.act_window">
+        <field name="name">Tablero de desviaciones</field>
+        <field name="res_model">concrete.delivery.dosage</field>
+        <field name="view_mode">graph,pivot,list</field>
+        <field name="context">{'search_default_out_of_tolerance': 1}</field>
+    </record>
+
+    <record id="view_concrete_dosage_search" model="ir.ui.view">
+        <field name="name">concrete.delivery.dosage.search</field>
+        <field name="model">concrete.delivery.dosage</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="material_id"/>
+                <field name="order_id"/>
+                <filter name="out_of_tolerance" string="Fuera de tolerancia"
+                        domain="[('out_of_tolerance','=',True)]"/>
+                <separator/>
+                <filter name="g_material" string="Material"
+                        context="{'group_by':'material_id'}"/>
+                <filter name="g_order" string="Orden"
+                        context="{'group_by':'order_id'}"/>
+            </search>
+        </field>
     </record>
 </odoo>
