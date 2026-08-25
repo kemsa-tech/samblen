@@ -9,7 +9,7 @@
     </record>
 
     <record id="seq_concrete_frumecar_remision" model="ir.sequence">
-        <field name="name">Remision Frumecar</field>
+        <field name="name">Remisión Frumecar</field>
         <field name="code">concrete.frumecar.remision</field>
         <field name="prefix">FRM-</field>
         <field name="padding">4</field>

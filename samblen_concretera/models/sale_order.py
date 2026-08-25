@@ -11,10 +11,10 @@ class SaleOrder(models.Model):
         [('interno', 'Interno'), ('externo', 'Externo')],
         string='Tipo de surtimiento', default='externo')
     concrete_design_id = fields.Many2one('concrete.mix.design',
-                                         string='Diseno de mezcla')
+                                         string='Diseño de mezcla')
     concrete_distance_km = fields.Float(string='Distancia a obra (km)')
     concrete_osc_ids = fields.One2many('concrete.supply.order', 'sale_order_id',
-                                       string='Ordenes de Surtimiento')
+                                       string='Órdenes de Surtimiento')
     concrete_osc_count = fields.Integer(compute='_compute_osc_count')
 
     @api.depends('concrete_osc_ids')
@@ -39,7 +39,7 @@ class SaleOrder(models.Model):
             design = concrete_line.product_id.product_tmpl_id.concrete_design_id
         if not design:
             raise UserError(_(
-                'Define un diseno de mezcla en la cotizacion para generar '
+                'Define un diseño de mezcla en la cotización para generar '
                 'la Orden de Surtimiento.'))
         return self.env['concrete.supply.order'].create({
             'partner_id': self.partner_id.id,
@@ -56,7 +56,7 @@ class SaleOrder(models.Model):
     def action_compute_freight(self):
         """Calcula el flete por distancia y crea/actualiza la linea.
         Tarifas de ejemplo en el producto 'Flete de concreto'; ajustar con
-        la cotizacion real de Samblen (por zona, por km, o incluido)."""
+        la cotización real de Samblen (por zona, por km, o incluido)."""
         self.ensure_one()
         tmpl = self.env.ref('samblen_concretera.product_flete',
                             raise_if_not_found=False)
@@ -86,7 +86,7 @@ class SaleOrder(models.Model):
         self.ensure_one()
         osc = self._create_osc()
         self.message_post(body=_(
-            'Orden de Surtimiento %s generada desde esta cotizacion.'
+            'Orden de Surtimiento %s generada desde esta cotización.'
         ) % osc.name)
         return {
             'type': 'ir.actions.act_window',
@@ -100,7 +100,7 @@ class SaleOrder(models.Model):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Ordenes de Surtimiento'),
+            'name': _('Órdenes de Surtimiento'),
             'res_model': 'concrete.supply.order',
             'view_mode': 'list,form',
             'domain': [('sale_order_id', '=', self.id)],

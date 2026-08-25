@@ -4,15 +4,15 @@ from odoo import api, fields, models
 
 class ConcreteMixDesign(models.Model):
     _name = 'concrete.mix.design'
-    _description = 'Diseno de mezcla'
+    _description = 'Diseño de mezcla'
     _order = 'name'
 
-    name = fields.Char(string='Clave del diseno', required=True)
+    name = fields.Char(string='Clave del diseño', required=True)
     resistance = fields.Char(string='Resistencia', default='250 kg/cm2')
     tma = fields.Char(string='TMA', default='20 mm')
     revenimiento = fields.Char(string='Revenimiento', default='14 cm')
     tolerance = fields.Float(string='Tolerancia (%)', default=3.0,
-                             help='Desviacion maxima permitida por material.')
+                             help='Desviación maxima permitida por material.')
     line_ids = fields.One2many('concrete.mix.design.line', 'design_id',
                                string='Materiales por m3')
     active = fields.Boolean(default=True)
@@ -26,7 +26,7 @@ class ConcreteMixDesign(models.Model):
 
 class ConcreteMixDesignLine(models.Model):
     _name = 'concrete.mix.design.line'
-    _description = 'Linea de diseno de mezcla'
+    _description = 'Linea de diseño de mezcla'
     _order = 'sequence, id'
 
     design_id = fields.Many2one('concrete.mix.design', required=True,

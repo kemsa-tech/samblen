@@ -8,7 +8,7 @@ class ConcreteSupplyOrder(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'id desc'
 
-    name = fields.Char(string='Numero', default='Nueva', copy=False,
+    name = fields.Char(string='Número', default='Nueva', copy=False,
                        readonly=True, index=True)
     partner_id = fields.Many2one('res.partner', string='Cliente',
                                  required=True, tracking=True)
@@ -16,7 +16,7 @@ class ConcreteSupplyOrder(models.Model):
     tipo = fields.Selection(
         [('interno', 'Interno'), ('externo', 'Externo')],
         string='Tipo', default='externo', tracking=True)
-    design_id = fields.Many2one('concrete.mix.design', string='Diseno',
+    design_id = fields.Many2one('concrete.mix.design', string='Diseño',
                                 required=True, tracking=True)
     resistance = fields.Char(string='Resistencia', default='250 kg/cm2')
     tma = fields.Char(string='TMA', default='20 mm')
@@ -32,9 +32,9 @@ class ConcreteSupplyOrder(models.Model):
     origin = fields.Char(string='Origen')
     destination = fields.Char(string='Destino')
     delivery_ids = fields.One2many('concrete.delivery', 'order_id',
-                                   string='Vehiculos / Ollas')
+                                   string='Vehículos / Ollas')
     delivery_count = fields.Integer(compute='_compute_delivery_count')
-    deviation_alert = fields.Boolean(string='Desviacion',
+    deviation_alert = fields.Boolean(string='Desviación',
                                      compute='_compute_progress', store=True)
     state = fields.Selection([
         ('draft', 'Solicitado'),
@@ -45,7 +45,7 @@ class ConcreteSupplyOrder(models.Model):
         ('cancel', 'Cancelado'),
     ], string='Estado', default='draft', tracking=True)
     company_id = fields.Many2one('res.company', default=lambda s: s.env.company)
-    sale_order_id = fields.Many2one('sale.order', string='Cotizacion',
+    sale_order_id = fields.Many2one('sale.order', string='Cotización',
                                     readonly=True, copy=False)
     olla_capacity = fields.Float(string='Capacidad por olla (m3)', default=7.0)
 
@@ -77,7 +77,7 @@ class ConcreteSupplyOrder(models.Model):
         for rec in self:
             rec.state = 'released'
             rec.message_post(body=_(
-                'Cotizacion liberada. Notificada al area de Concretera '
+                'Cotización liberada. Notificada al área de Concretera '
                 'y agendada para surtido.'))
         return True
 
@@ -112,7 +112,7 @@ class ConcreteSupplyOrder(models.Model):
                 rec._generate_ollas()
             rec.state = 'dosing'
             rec.message_post(body=_(
-                'Diseno de mezcla %s enviado a Frumecar (Odoo -> Frumecar). '
+                'Diseño de mezcla %s enviado a Frumecar (Odoo -> Frumecar). '
                 'Ollas generadas: %s.'
             ) % (rec.design_id.name or '', len(rec.delivery_ids)))
         return True
@@ -144,7 +144,7 @@ class ConcreteSupplyOrder(models.Model):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_window',
-            'name': _('Vehiculos / Ollas'),
+            'name': _('Vehículos / Ollas'),
             'res_model': 'concrete.delivery',
             'view_mode': 'list,form',
             'domain': [('order_id', '=', self.id)],

@@ -4,7 +4,7 @@
         <field name="name">concrete.mix.design.list</field>
         <field name="model">concrete.mix.design</field>
         <field name="arch" type="xml">
-            <list string="Disenos de mezcla">
+            <list string="Diseños de mezcla">
                 <field name="name"/>
                 <field name="resistance"/>
                 <field name="tma"/>
@@ -19,7 +19,7 @@
         <field name="name">concrete.mix.design.form</field>
         <field name="model">concrete.mix.design</field>
         <field name="arch" type="xml">
-            <form string="Diseno de mezcla">
+            <form string="Diseño de mezcla">
                 <sheet>
                     <div class="oe_title">
                         <label for="name"/>
@@ -54,7 +54,7 @@
     </record>
 
     <record id="action_concrete_mix_design" model="ir.actions.act_window">
-        <field name="name">Disenos de mezcla</field>
+        <field name="name">Diseños de mezcla</field>
         <field name="res_model">concrete.mix.design</field>
         <field name="view_mode">list,form</field>
     </record>

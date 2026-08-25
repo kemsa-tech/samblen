@@ -16,7 +16,7 @@
         <field name="uom_id" ref="uom.product_uom_kgm"/>
     </record>
     <record id="prod_arena_rio" model="product.product">
-        <field name="name">Arena de rio</field>
+        <field name="name">Arena de río</field>
         <field name="type">consu</field>
         <field name="is_storable">1</field>
         <field name="is_concrete_material">1</field>
@@ -88,9 +88,9 @@
         <field name="quantity">2000</field>
     </record>
 
-    <!-- ============ Producto de produccion + BoM (diseno) ============ -->
+    <!-- ============ Producto de producción + BoM (diseño) ============ -->
     <record id="tmpl_concreto_prod" model="product.template">
-        <field name="name">Concreto FC 250 (produccion)</field>
+        <field name="name">Concreto FC 250 (producción)</field>
         <field name="type">consu</field>
         <field name="is_storable">1</field>
         <field name="uom_id" ref="uom.product_uom_unit"/>
@@ -145,7 +145,7 @@
         <field name="product_uom_id" ref="uom.product_uom_litre"/>
     </record>
 
-    <!-- ============ Enlace material (diseno) -> producto ============ -->
+    <!-- ============ Enlace material (diseño) -> producto ============ -->
     <record id="mat_cemento" model="concrete.material">
         <field name="product_id" ref="prod_cemento"/></record>
     <record id="mat_grava_calidra" model="concrete.material">

@@ -4,7 +4,7 @@ from odoo import api, fields, models, _
 
 _logger = logging.getLogger(__name__)
 
-# Variacion simulada del dosificado real vs diseno, por clave de material.
+# Variacion simulada del dosificado real vs diseño, por clave de material.
 # Reproduce el escenario de la demo (cemento fuera de tolerancia).
 _SIM_VARIANCE = {
     'CEM': 0.95238,      # -4.76%  -> fuera de +/-3%
@@ -20,25 +20,25 @@ _SIM_VARIANCE = {
 
 class ConcreteDelivery(models.Model):
     _name = 'concrete.delivery'
-    _description = 'Remision / Olla'
+    _description = 'Remisión / Olla'
     _inherit = ['mail.thread']
     _order = 'order_id, olla'
 
     name = fields.Char(string='Olla', required=True, default='Olla')
     order_id = fields.Many2one('concrete.supply.order', string='Orden',
                                required=True, ondelete='cascade', tracking=True)
-    design_id = fields.Many2one(related='order_id.design_id', string='Diseno',
+    design_id = fields.Many2one(related='order_id.design_id', string='Diseño',
                                 readonly=True, store=True)
     olla = fields.Integer(string='No. olla', default=1)
     vehicle_id = fields.Many2one('fleet.vehicle', string='Olla / Unidad',
                                  help='Unidad revolvedora del catalogo de Flota.')
     operator = fields.Char(string='Operador')
     volume_m3 = fields.Float(string='Volumen (m3)', default=7.0)
-    frumecar_remision = fields.Char(string='Remision Frumecar', tracking=True)
+    frumecar_remision = fields.Char(string='Remisión Frumecar', tracking=True)
     date_load = fields.Datetime(string='Fecha/Hora de carga')
     km_start = fields.Float(string='Km inicial')
     km_end = fields.Float(string='Km final')
-    diesel_l = fields.Float(string='Diesel (L)')
+    diesel_l = fields.Float(string='Diésel (L)')
     state = fields.Selection([
         ('waiting', 'En espera'),
         ('dosed', 'Dosificada'),
@@ -50,7 +50,7 @@ class ConcreteDelivery(models.Model):
     deviation_count = fields.Integer(string='Desviaciones',
                                      compute='_compute_oot', store=True)
     production_id = fields.Many2one('mrp.production',
-                                    string='Orden de fabricacion', readonly=True)
+                                    string='Orden de fabricación', readonly=True)
 
     @api.depends('dosage_ids.out_of_tolerance')
     def _compute_oot(self):
@@ -66,7 +66,7 @@ class ConcreteDelivery(models.Model):
                 rec.operator = rec.vehicle_id.driver_id.name
 
     def _simulate_dosage(self):
-        """Genera el dosificado real a partir del diseno (simula Frumecar)
+        """Genera el dosificado real a partir del diseño (simula Frumecar)
         cuando la olla aun no tiene lineas de dosificado."""
         Dosage = self.env['concrete.delivery.dosage']
         for rec in self:
@@ -82,8 +82,8 @@ class ConcreteDelivery(models.Model):
                     'qty_real': round(qty, 3),
                 })
 
-    def action_receive_remision(self):
-        """Simula la recepcion de la remision de Frumecar. En produccion lo
+    def action_receive_remisión(self):
+        """Simula la recepción de la remisión de Frumecar. En producción lo
         dispara el middleware conectado al puerto bidireccional."""
         for rec in self:
             if not rec.frumecar_remision:
@@ -98,7 +98,7 @@ class ConcreteDelivery(models.Model):
         return True
 
     def _consume_materials(self):
-        """Genera una orden de fabricacion (MRP) que consume del almacen el
+        """Genera una orden de fabricación (MRP) que consume del almacen el
         material REAL dosificado por Frumecar -> control de inventario nativo.
         Defensivo: si MRP no puede cerrar la orden en esta instancia, se deja
         confirmada y no se interrumpe el flujo de la demo."""
@@ -132,7 +132,7 @@ class ConcreteDelivery(models.Model):
                                 skip_backorder=True).button_mark_done()
                 rec.production_id = mo.id
             except Exception as e:  # noqa: BLE001
-                _logger.warning('No se pudo cerrar la orden de fabricacion '
+                _logger.warning('No se pudo cerrar la orden de fabricación '
                                 'para %s: %s', rec.name, e)
                 if 'mo' in locals() and mo:
                     rec.production_id = mo.id
@@ -153,12 +153,12 @@ class ConcreteDelivery(models.Model):
                 names = ', '.join(oot.mapped('material_id.name'))
                 tol = rec.order_id.design_id.tolerance or 0.0
                 rec.order_id.message_post(body=_(
-                    'Aviso de desviacion en %s (%s): %s fuera de tolerancia '
-                    '(+/-%.1f%%). Revisar el motivo de la dosificacion.'
+                    'Aviso de desviación en %s (%s): %s fuera de tolerancia '
+                    '(+/-%.1f%%). Revisar el motivo de la dosificación.'
                 ) % (rec.name, rec.frumecar_remision or '', names, tol))
                 rec.order_id.activity_schedule(
                     'mail.mail_activity_data_todo',
-                    summary=_('Revisar desviacion %s') % rec.name,
+                    summary=_('Revisar desviación %s') % rec.name,
                     note=_('Materiales fuera de tolerancia: %s') % names)
 
 
@@ -175,10 +175,10 @@ class ConcreteDeliveryDosage(models.Model):
                                   required=True)
     uom = fields.Selection(related='material_id.uom', string='UdM',
                            readonly=True)
-    qty_design = fields.Float(string='Diseno', digits=(16, 3),
+    qty_design = fields.Float(string='Diseño', digits=(16, 3),
                               compute='_compute_qty_design', store=True)
     qty_real = fields.Float(string='Dosificado real', digits=(16, 3))
-    deviation = fields.Float(string='Desviacion (%)', digits=(16, 2),
+    deviation = fields.Float(string='Desviación (%)', digits=(16, 2),
                              compute='_compute_deviation', store=True)
     out_of_tolerance = fields.Boolean(string='Fuera de tolerancia',
                                       compute='_compute_oot', store=True)

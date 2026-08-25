@@ -17,7 +17,7 @@
         <field name="uom">kg</field>
     </record>
     <record id="mat_arena_rio" model="concrete.material">
-        <field name="name">Arena de rio</field>
+        <field name="name">Arena de río</field>
         <field name="code">ARE-RIO</field><field name="sequence">40</field>
         <field name="uom">kg</field>
     </record>
@@ -42,7 +42,7 @@
         <field name="uom">l</field>
     </record>
 
-    <!-- Diseno de mezcla FC 250 -->
+    <!-- Diseño de mezcla FC 250 -->
     <record id="design_fc250" model="concrete.mix.design">
         <field name="name">D-FC250-20</field>
         <field name="resistance">250 kg/cm2</field>

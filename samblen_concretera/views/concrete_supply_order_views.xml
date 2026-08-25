@@ -4,7 +4,7 @@
         <field name="name">concrete.supply.order.list</field>
         <field name="model">concrete.supply.order</field>
         <field name="arch" type="xml">
-            <list string="Ordenes de Surtimiento" decoration-danger="deviation_alert == True">
+            <list string="Órdenes de Surtimiento" decoration-danger="deviation_alert == True">
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="obra"/>
@@ -29,7 +29,7 @@
                     <button name="action_release" type="object" string="Liberar"
                             class="btn-primary" invisible="state != 'draft'"/>
                     <button name="action_send_frumecar" type="object"
-                            string="Enviar diseno a Frumecar" class="btn-primary"
+                            string="Enviar diseño a Frumecar" class="btn-primary"
                             invisible="state != 'released'"/>
                     <button name="action_done" type="object" string="Marcar surtido"
                             invisible="state not in ('dosing','partial')"/>
@@ -47,7 +47,7 @@
                             <field name="delivery_count" widget="statinfo" string="Ollas"/>
                         </button>
                     </div>
-                    <widget name="web_ribbon" title="Desviacion"
+                    <widget name="web_ribbon" title="Desviación"
                             bg_color="text-bg-danger" invisible="not deviation_alert"/>
                     <div class="oe_title">
                         <label for="name"/>
@@ -78,7 +78,7 @@
                         <field name="destination"/>
                     </group>
                     <notebook>
-                        <page string="Vehiculos / Ollas">
+                        <page string="Vehículos / Ollas">
                             <field name="delivery_ids">
                                 <list decoration-danger="out_of_tolerance == True">
                                     <field name="name"/>
@@ -107,7 +107,7 @@
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="obra"/>
-                <filter name="f_dev" string="Con desviacion"
+                <filter name="f_dev" string="Con desviación"
                         domain="[('deviation_alert','=',True)]"/>
                 <separator/>
                 <filter name="f_draft" string="Solicitado" domain="[('state','=','draft')]"/>
@@ -121,7 +121,7 @@
     </record>
 
     <record id="action_concrete_supply_order" model="ir.actions.act_window">
-        <field name="name">Ordenes de Surtimiento</field>
+        <field name="name">Órdenes de Surtimiento</field>
         <field name="res_model">concrete.supply.order</field>
         <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_concrete_supply_order_search"/>

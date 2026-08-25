@@ -4,19 +4,19 @@
               web_icon="samblen_concretera,static/description/icon.png"
               sequence="15"/>
 
-    <menuitem id="menu_concretera_osc" name="Ordenes de Surtimiento"
+    <menuitem id="menu_concretera_osc" name="Órdenes de Surtimiento"
               parent="menu_concretera_root" action="action_concrete_supply_order"
               sequence="10"/>
 
-    <menuitem id="menu_concretera_prod" name="Produccion"
+    <menuitem id="menu_concretera_prod" name="Producción"
               parent="menu_concretera_root" sequence="20"/>
-    <menuitem id="menu_concretera_designs" name="Disenos de mezcla"
+    <menuitem id="menu_concretera_designs" name="Diseños de mezcla"
               parent="menu_concretera_prod" action="action_concrete_mix_design"
               sequence="10"/>
     <menuitem id="menu_concretera_materials" name="Materiales"
               parent="menu_concretera_prod" action="action_concrete_material"
               sequence="20"/>
-    <menuitem id="menu_concretera_deliveries" name="Remisiones"
+    <menuitem id="menu_concretera_deliveries" name="Remisiónes"
               parent="menu_concretera_prod" action="action_concrete_delivery"
               sequence="30"/>
 
@@ -34,14 +34,14 @@
     <menuitem id="menu_concretera_dev_dashboard" name="Tablero de desviaciones"
               parent="menu_concretera_reports" action="action_deviation_dashboard"
               sequence="5"/>
-    <menuitem id="menu_concretera_dash_surtido" name="m3 surtidos por dia"
+    <menuitem id="menu_concretera_dash_surtido" name="m3 surtidos por día"
               parent="menu_concretera_reports" action="action_dash_surtido"
               sequence="6"/>
-    <menuitem id="menu_concretera_dash_dev_design" name="Desviaciones por diseno"
+    <menuitem id="menu_concretera_dash_dev_design" name="Desviaciones por diseño"
               parent="menu_concretera_reports" action="action_dash_dev_design"
               sequence="7"/>
 
-    <menuitem id="menu_concretera_config" name="Configuracion"
+    <menuitem id="menu_concretera_config" name="Configuración"
               parent="menu_concretera_root" sequence="90"/>
     <menuitem id="menu_concretera_freight" name="Tarifa de flete"
               parent="menu_concretera_config" action="action_freight_config"

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Reporte Concretera: remisiones (lista + tabla dinamica) -->
+    <!-- Reporte Concretera: remisiónes (lista + tabla dinámica) -->
     <record id="view_concrete_report_list" model="ir.ui.view">
         <field name="name">concrete.delivery.report.list</field>
         <field name="model">concrete.delivery</field>
@@ -59,7 +59,7 @@
                 <field name="order_id"/>
                 <field name="delivery_id"/>
                 <field name="material_id"/>
-                <field name="qty_design" sum="Diseno"/>
+                <field name="qty_design" sum="Diseño"/>
                 <field name="qty_real" sum="Dosificado"/>
                 <field name="deviation"/>
                 <field name="uom"/>
@@ -120,7 +120,7 @@
         <field name="name">concrete.delivery.graph.dev</field>
         <field name="model">concrete.delivery</field>
         <field name="arch" type="xml">
-            <graph string="Desviaciones por diseno" type="bar" sample="1">
+            <graph string="Desviaciones por diseño" type="bar" sample="1">
                 <field name="design_id"/>
                 <field name="deviation_count" type="measure"/>
             </graph>
@@ -128,7 +128,7 @@
     </record>
 
     <record id="action_dash_surtido" model="ir.actions.act_window">
-        <field name="name">m3 surtidos por dia</field>
+        <field name="name">m3 surtidos por día</field>
         <field name="res_model">concrete.delivery</field>
         <field name="view_mode">graph,pivot,list</field>
         <field name="domain">[('state', '=', 'dosed')]</field>
@@ -141,7 +141,7 @@
     </record>
 
     <record id="action_dash_dev_design" model="ir.actions.act_window">
-        <field name="name">Desviaciones por diseno</field>
+        <field name="name">Desviaciones por diseño</field>
         <field name="res_model">concrete.delivery</field>
         <field name="view_mode">graph,pivot,list</field>
         <field name="domain">[('out_of_tolerance', '=', True)]</field>

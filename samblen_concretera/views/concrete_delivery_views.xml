@@ -4,7 +4,7 @@
         <field name="name">concrete.delivery.list</field>
         <field name="model">concrete.delivery</field>
         <field name="arch" type="xml">
-            <list string="Remisiones / Ollas" decoration-danger="out_of_tolerance == True">
+            <list string="Remisiónes / Ollas" decoration-danger="out_of_tolerance == True">
                 <field name="frumecar_remision"/>
                 <field name="order_id"/>
                 <field name="name"/>
@@ -23,10 +23,10 @@
         <field name="name">concrete.delivery.form</field>
         <field name="model">concrete.delivery</field>
         <field name="arch" type="xml">
-            <form string="Remision / Olla">
+            <form string="Remisión / Olla">
                 <header>
-                    <button name="action_receive_remision" type="object"
-                            string="Recibir remision (Frumecar)" class="btn-primary"
+                    <button name="action_receive_remisión" type="object"
+                            string="Recibir remisión (Frumecar)" class="btn-primary"
                             invisible="state != 'waiting'"/>
                     <field name="state" widget="statusbar"/>
                 </header>
@@ -35,7 +35,7 @@
                         <button class="oe_stat_button" icon="fa-industry"
                                 type="object" name="action_view_production"
                                 invisible="not production_id">
-                            <span class="o_stat_text">Orden de<br/>fabricacion</span>
+                            <span class="o_stat_text">Orden de<br/>fabricación</span>
                         </button>
                     </div>
                     <widget name="web_ribbon" title="Fuera de tolerancia"
@@ -63,7 +63,7 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Dosificado real vs Diseno">
+                        <page string="Dosificado real vs Diseño">
                             <field name="dosage_ids">
                                 <list editable="bottom" decoration-danger="out_of_tolerance == True">
                                     <field name="material_id"/>
@@ -83,7 +83,7 @@
     </record>
 
     <record id="action_concrete_delivery" model="ir.actions.act_window">
-        <field name="name">Remisiones</field>
+        <field name="name">Remisiónes</field>
         <field name="res_model">concrete.delivery</field>
         <field name="view_mode">list,form</field>
     </record>

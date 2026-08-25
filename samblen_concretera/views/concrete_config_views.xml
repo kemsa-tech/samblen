@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- ===== Configuracion de tarifa de flete ===== -->
+    <!-- ===== Configuración de tarifa de flete ===== -->
     <record id="view_freight_config_form" model="ir.ui.view">
         <field name="name">product.template.freight.form</field>
         <field name="model">product.template</field>
@@ -17,7 +17,7 @@
                             <field name="freight_per_km"/>
                             <field name="freight_free_km"/>
                         </group>
-                        <group string="Formula">
+                        <group string="Fórmula">
                             <div colspan="2">
                                 <p>Flete = <b>base</b> + <b>$/km</b> x (distancia - <b>radio gratis</b>)</p>
                                 <p class="text-muted">Ejemplo: 0 + 45 x (18.4 - 5) = 603.00</p>

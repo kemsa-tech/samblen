@@ -26,7 +26,7 @@
             <field name="state">dosing</field>
         </record>
 
-        <!-- Olla 1: dosificada, con desviacion en cemento -->
+        <!-- Olla 1: dosificada, con desviación en cemento -->
         <record id="del_olla1" model="concrete.delivery">
             <field name="name">Olla 1</field>
             <field name="order_id" ref="osc_22254"/>
@@ -70,7 +70,7 @@
             <field name="material_id" ref="mat_viscoflow"/><field name="qty_real">5.7</field>
         </record>
 
-        <!-- Olla 2: en espera de remision -->
+        <!-- Olla 2: en espera de remisión -->
         <record id="del_olla2" model="concrete.delivery">
             <field name="name">Olla 2</field>
             <field name="order_id" ref="osc_22254"/>

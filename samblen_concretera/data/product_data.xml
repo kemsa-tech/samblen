@@ -16,7 +16,7 @@
         <field name="invoice_policy">order</field>
     </record>
 
-    <!-- Flete: tarifas de EJEMPLO, ajustar con la cotizacion real de Samblen -->
+    <!-- Flete: tarifas de EJEMPLO, ajustar con la cotización real de Samblen -->
     <record id="product_flete" model="product.template">
         <field name="name">Flete de concreto</field>
         <field name="type">service</field>

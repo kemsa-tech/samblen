@@ -3,20 +3,20 @@
     'name': 'Samblen Concretera',
     'version': '19.0.1.0.0',
     'category': 'Manufacturing',
-    'summary': 'Surtimiento de concreto, diseno de mezcla, control de desviaciones e integracion con Frumecar (PoC)',
+    'summary': 'Surtimiento de concreto, diseño de mezcla, control de desviaciones e integración con Frumecar (PoC)',
     'description': """
-Modulo Concretera para Samblen (Prueba de Concepto)
+Módulo Concretera para Samblen (Prueba de Concepto)
 ===================================================
-Cubre el flujo: Cotizacion -> Orden de Surtimiento de Concreto (OSC) ->
-Dosificacion (Frumecar) -> Control de desviaciones -> Reporte unificado.
+Cubre el flujo: Cotización -> Orden de Surtimiento de Concreto (OSC) ->
+Dosificación (Frumecar) -> Control de desviaciones -> Reporte unificado.
 
-- Diseno de mezcla (formula por m3) con tolerancia.
-- Orden de Surtimiento de Concreto con vehiculos/ollas y remision Frumecar.
-- Comparador diseno vs dosificado con aviso automatico al salir de tolerancia.
-- Reporte Concretera (lista + tabla dinamica) y consumo de material.
+- Diseño de mezcla (fórmula por m3) con tolerancia.
+- Orden de Surtimiento de Concreto con vehículos/ollas y remisión Frumecar.
+- Comparador diseño vs dosificado con aviso automático al salir de tolerancia.
+- Reporte Concretera (lista + tabla dinámica) y consumo de material.
 
-Punto de integracion Frumecar simulado mediante la accion "Recibir remision"
-(en produccion lo dispara el middleware conectado al puerto bidireccional).
+Punto de integración Frumecar simulado mediante la acción "Recibir remisión"
+(en producción lo dispara el middleware conectado al puerto bidireccional).
 """,
     'author': 'Kemsa Solutions',
     'website': 'https://github.com/kemsa-tech/samblen',
