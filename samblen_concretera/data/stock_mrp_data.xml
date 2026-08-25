@@ -51,7 +51,8 @@
         <field name="uom_id" ref="uom.product_uom_litre"/>
     </record>
 
-    <!-- ============ Existencias iniciales (almacen) ============ -->
+    <!-- ==== Existencias iniciales (solo al instalar, no en upgrades) ==== -->
+    <data noupdate="1">
     <record id="quant_cemento" model="stock.quant">
         <field name="product_id" ref="prod_cemento"/>
         <field name="location_id" ref="stock.stock_location_stock"/>
@@ -87,6 +88,7 @@
         <field name="location_id" ref="stock.stock_location_stock"/>
         <field name="quantity">2000</field>
     </record>
+    </data>
 
     <!-- ============ Producto de producción + BoM (diseño) ============ -->
     <record id="tmpl_concreto_prod" model="product.template">
