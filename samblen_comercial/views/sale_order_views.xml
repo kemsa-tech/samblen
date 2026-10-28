@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_comercial" model="ir.ui.view">
+        <field name="name">sale.order.form.samblen.comercial</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="samblen_concretera.view_order_form_concrete"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_compute_freight']" position="replace">
+                <button name="action_compute_charges" type="object"
+                        string="Calcular cargos" invisible="state in ('sale','cancel')"/>
+                <button name="action_request_discount_approval" type="object"
+                        string="Solicitar aprobación de descuento" class="btn-primary"
+                        invisible="not discount_needs_approval or discount_state == 'pending'"/>
+                <button name="action_approve_discount" type="object"
+                        string="Aprobar descuento" class="btn-success"
+                        invisible="discount_state != 'pending'"
+                        groups="samblen_comercial.group_discount_approver"/>
+                <button name="action_reject_discount" type="object"
+                        string="Rechazar descuento"
+                        invisible="discount_state != 'pending'"
+                        groups="samblen_comercial.group_discount_approver"/>
+            </xpath>
+            <xpath expr="//field[@name='concrete_tipo']" position="after">
+                <field name="concrete_pump"/>
+                <field name="concrete_shift"/>
+                <field name="max_line_discount"/>
+                <field name="discount_needs_approval" invisible="1"/>
+                <field name="discount_state" widget="badge"
+                       decoration-warning="discount_state == 'pending'"
+                       decoration-success="discount_state == 'approved'"
+                       decoration-danger="discount_state == 'rejected'"/>
+                <field name="discount_approver_id" invisible="not discount_approver_id"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

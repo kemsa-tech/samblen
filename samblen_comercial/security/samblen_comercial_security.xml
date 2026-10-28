@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_discount_approver" model="res.groups">
+        <field name="name">Aprobador de descuentos (Samblen)</field>
+    </record>
+    <!-- Descuento por línea visible para todos los usuarios internos -->
+    <record id="base.group_user" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('sale.group_discount_per_so_line'))]"/>
+    </record>
+</odoo>

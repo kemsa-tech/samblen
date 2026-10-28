@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_product_form_comercial" model="ir.ui.view">
+        <field name="name">product.template.form.samblen.comercial</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Samblen comercial" name="samblen_comercial">
+                    <group>
+                        <field name="is_prefab"/>
+                        <field name="is_pump_service"/>
+                        <field name="is_shift_surcharge"/>
+                        <field name="shift_night_pct" invisible="not is_shift_surcharge"/>
+                        <field name="shift_sunday_pct" invisible="not is_shift_surcharge"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+    <record id="action_prefab_products" model="ir.actions.act_window">
+        <field name="name">Prefabricados</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('is_prefab', '=', True)]</field>
+        <field name="context">{'default_is_prefab': True}</field>
+    </record>
+    <menuitem id="menu_prefab_products" name="Prefabricados"
+              parent="sale.product_menu_catalog" action="action_prefab_products"
+              sequence="30"/>
+</odoo>

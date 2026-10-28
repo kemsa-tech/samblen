@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tarifas de ejemplo: ajustar con la cotización real de Samblen -->
+    <record id="product_bombeo" model="product.template">
+        <field name="name">Servicio de bombeo</field>
+        <field name="type">service</field>
+        <field name="list_price">120.0</field>
+        <field name="is_pump_service">1</field>
+        <field name="invoice_policy">order</field>
+    </record>
+    <record id="product_recargo_turno" model="product.template">
+        <field name="name">Recargo por turno</field>
+        <field name="type">service</field>
+        <field name="list_price">0.0</field>
+        <field name="is_shift_surcharge">1</field>
+        <field name="shift_night_pct">10.0</field>
+        <field name="shift_sunday_pct">15.0</field>
+        <field name="invoice_policy">order</field>
+    </record>
+    <record id="product_prefab_losa" model="product.template">
+        <field name="name">Losa prefabricada (vigueta y bovedilla) m2</field>
+        <field name="type">consu</field>
+        <field name="list_price">650.0</field>
+        <field name="is_prefab">1</field>
+    </record>
+    <record id="product_prefab_tubo" model="product.template">
+        <field name="name">Tubo de concreto 60 cm</field>
+        <field name="type">consu</field>
+        <field name="list_price">1450.0</field>
+        <field name="is_prefab">1</field>
+    </record>
+</odoo>
