@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_server_load_demo" model="ir.actions.server">
+        <field name="name">Cargar datos demo</field>
+        <field name="model_id" ref="model_samblen_demo_loader"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_load()</field>
+    </record>
+    <menuitem id="menu_load_demo" name="Cargar datos demo"
+              parent="samblen_concretera.menu_concretera_config"
+              action="action_server_load_demo" sequence="99"
+              groups="base.group_system"/>
+</odoo>

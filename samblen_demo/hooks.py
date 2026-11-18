@@ -5,6 +5,8 @@ from datetime import timedelta
 
 from odoo import fields
 
+from .erp_demo import load_erp_demo
+
 _logger = logging.getLogger(__name__)
 
 # (nombre, resistencia, factor de cemento vs FC 250, precio por m3)
@@ -204,4 +206,5 @@ def post_init_hook(env):
                     delivery.date_load = when + timedelta(minutes=45 * n)
         except Exception as e:  # noqa: BLE001
             _logger.warning('Demo Samblen: no se pudo crear el escenario %s: %s', i, e)
-    _logger.info('Demo Samblen: escenario cargado.')
+    _logger.info('Demo Samblen: escenario concretera cargado.')
+    load_erp_demo(env)
