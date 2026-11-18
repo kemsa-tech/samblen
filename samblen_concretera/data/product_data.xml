@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="product_concreto_fc250" model="product.template">
-        <field name="name">Concreto FC 250 - TMA 20 - Rev 14</field>
+        <field name="name">Concreto FC 250</field>
         <field name="type">service</field>
         <field name="list_price">1850.0</field>
         <field name="is_concrete">1</field>

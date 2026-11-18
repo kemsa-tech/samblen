@@ -317,11 +317,17 @@ def _fleet_costs(env):
 
 # ----------------------------------------------------- Facturación (M2, M10)
 def _invoices(env):
-    orders = env['sale.order'].search([('state', '=', 'sale')], limit=6)
+    orders = env['sale.order'].search([('state', '=', 'sale'),
+                                       ('invoice_ids', '=', False)], limit=6)
+    Wizard = env['sale.advance.payment.inv']
     for so in orders:
         try:
             with env.cr.savepoint():
-                so._create_invoices()
+                ctx = {'active_model': 'sale.order', 'active_ids': so.ids}
+                Wizard.with_context(**ctx).create({
+                    'advance_payment_method': 'delivered',
+                    'sale_order_ids': [(6, 0, so.ids)],
+                }).create_invoices()
         except Exception as e:  # noqa: BLE001
             _logger.warning('Demo factura %s: %s', so.name, e)
 

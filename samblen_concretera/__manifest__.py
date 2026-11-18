@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Samblen Concretera',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.0.1',
     'category': 'Manufacturing',
     'summary': 'Surtimiento de concreto, diseño de mezcla, control de desviaciones e integración con Frumecar (PoC)',
     'description': """

@@ -80,7 +80,7 @@ def _create_designs(env):
         })
         designs[key] = design
         products[key] = env['product.template'].create({
-            'name': 'Concreto FC %s - TMA 20 - Rev 14' % key,
+            'name': 'Concreto FC %s' % key,
             'type': 'service', 'list_price': price, 'is_concrete': True,
             'concrete_design_id': design.id, 'invoice_policy': 'order',
         })
@@ -132,11 +132,13 @@ def post_init_hook(env):
     if flete:
         flete.write({'freight_base': 350.0, 'freight_per_km': 38.0,
                      'freight_free_km': 8.0})
-    env.user.samblen_max_discount = 5.0
+    # El hook corre como usuario del sistema: los permisos van al administrador
+    sellers = env.user | (_ref(env, 'base.user_admin') or env['res.users'])
+    sellers.write({'samblen_max_discount': 5.0})
     group = _ref(env, 'samblen_comercial.group_discount_approver')
     if group:
         field = 'user_ids' if 'user_ids' in group._fields else 'users'
-        group.write({field: [(4, env.user.id)]})
+        group.write({field: [(4, u.id) for u in sellers]})
 
     partners = env['res.partner']
     for name, ctype, city in CUSTOMERS:

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Samblen - Datos de demostración',
-    'version': '19.0.1.1.0',
+    'version': '19.0.1.1.1',
     'category': 'Hidden',
     'summary': 'Escenario de demostración: clientes, obras, diseños, ollas, cotizaciones y surtimientos',
     'description': """
