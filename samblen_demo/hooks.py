@@ -50,6 +50,11 @@ def _ref(env, xmlid):
     return env.ref(xmlid, raise_if_not_found=False)
 
 
+def _opt(env, xmlid):
+    rec = _ref(env, 'samblen_comercial.' + xmlid)
+    return rec.id if rec else False
+
+
 def _create_designs(env):
     """Clona el diseño FC 250 ajustando cemento y agua por resistencia."""
     base = _ref(env, 'samblen_concretera.design_fc250')
@@ -164,7 +169,14 @@ def post_init_hook(env):
                     'concrete_distance_km': km,
                     'concrete_tipo': 'externo',
                     'concrete_design_id': product.concrete_design_id.id,
-                    'concrete_pump': bool(i % 3 == 0),
+                    'concrete_tma_option_id': _opt(env, 'opt_tma_10' if i % 4 == 0 else 'opt_tma_20'),
+                    'concrete_rev_option_id': _opt(env, 'opt_rev_18' if i % 3 == 0 else 'opt_rev_14'),
+                    'concrete_tiro_id': _opt(env, ['opt_tiro_pluma', 'opt_tiro_directo',
+                                                   'opt_tiro_canalon', 'opt_tiro_estac'][i % 4]),
+                    'concrete_additive_ids': [(6, 0, [x for x in [
+                        _opt(env, 'opt_add_fpp') if i % 2 == 0 else False,
+                        _opt(env, 'opt_add_imp') if i % 5 == 1 else False,
+                        _opt(env, 'opt_add_ret') if i % 6 == 2 else False] if x])],
                     'concrete_shift': 'night' if i % 5 == 0 else (
                         'sunday' if i % 7 == 0 else 'day'),
                     'order_line': [(0, 0, {

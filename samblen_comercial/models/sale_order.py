@@ -12,6 +12,19 @@ class SaleOrder(models.Model):
         ('night', 'Nocturno'),
         ('sunday', 'Domingo / festivo'),
     ], string='Turno de colado', default='day')
+    concrete_tma_option_id = fields.Many2one(
+        'samblen.concrete.option', string='TMA',
+        domain=[('option_type', '=', 'tma')])
+    concrete_rev_option_id = fields.Many2one(
+        'samblen.concrete.option', string='Revenimiento',
+        domain=[('option_type', '=', 'rev')])
+    concrete_additive_ids = fields.Many2many(
+        'samblen.concrete.option', 'sale_order_concrete_additive_rel',
+        'order_id', 'option_id', string='Aditivos',
+        domain=[('option_type', '=', 'additive')])
+    concrete_tiro_id = fields.Many2one(
+        'samblen.concrete.option', string='Tipo de tiro',
+        domain=[('option_type', '=', 'tiro')])
     max_line_discount = fields.Float(
         string='Descuento máximo (%)', compute='_compute_max_line_discount')
     discount_state = fields.Selection([
@@ -58,8 +71,21 @@ class SaleOrder(models.Model):
         if self.concrete_distance_km:
             self.action_compute_freight()
         m3 = self._concrete_qty()
+        # Opciones técnicas: TMA, revenimiento, aditivos y tiro
+        options = self.env['samblen.concrete.option'].with_context(
+            active_test=False).search([])
+        self.order_line.filtered(
+            lambda l: l.product_id in options.mapped('product_id')).unlink()
+        selected = (self.concrete_tma_option_id | self.concrete_rev_option_id
+                    | self.concrete_additive_ids | self.concrete_tiro_id)
+        new_lines = [(0, 0, {'product_id': p.id, 'product_uom_qty': q,
+                             'price_unit': pr, 'name': name})
+                     for p, q, pr, name in selected._charge_lines(m3)]
+        if new_lines:
+            self.write({'order_line': new_lines})
+
         pump = self.env.ref('samblen_comercial.product_bombeo')
-        if self.concrete_pump:
+        if self.concrete_pump and not self.concrete_tiro_id:
             self._set_charge_line(
                 pump.product_variant_id, m3, pump.list_price,
                 _('Servicio de bombeo (%.1f m3)') % m3)
@@ -139,6 +165,22 @@ class SaleOrder(models.Model):
                                       'el descuento al tope del vendedor.')
                                % self.env.user.name)
         return True
+
+    def _create_osc(self):
+        osc = super()._create_osc()
+        vals = {}
+        if self.concrete_tma_option_id:
+            vals['tma'] = self.concrete_tma_option_id.name
+        if self.concrete_rev_option_id:
+            vals['revenimiento'] = self.concrete_rev_option_id.name
+        if vals:
+            osc.write(vals)
+        extras = self.concrete_additive_ids.mapped('name')
+        if extras or self.concrete_tiro_id:
+            osc.message_post(body=_('Dosificación técnica: aditivos %s; tiro %s.') % (
+                ', '.join(extras) or _('ninguno'),
+                self.concrete_tiro_id.name or _('directo')))
+        return osc
 
     def action_confirm(self):
         for order in self:

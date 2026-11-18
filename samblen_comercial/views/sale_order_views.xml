@@ -21,7 +21,11 @@
                         groups="samblen_comercial.group_discount_approver"/>
             </xpath>
             <xpath expr="//field[@name='concrete_tipo']" position="after">
-                <field name="concrete_pump"/>
+                <field name="concrete_tma_option_id" options="{'no_create': True}"/>
+                <field name="concrete_rev_option_id" options="{'no_create': True}"/>
+                <field name="concrete_additive_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                <field name="concrete_tiro_id" options="{'no_create': True}"/>
+                <field name="concrete_pump" invisible="concrete_tiro_id"/>
                 <field name="concrete_shift"/>
                 <field name="max_line_discount"/>
                 <field name="discount_needs_approval" invisible="1"/>

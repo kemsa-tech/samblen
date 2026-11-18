@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Precios de EJEMPLO: ajustar con la lista real de Samblen -->
+    <data noupdate="1">
+        <record id="opt_tma_10" model="samblen.concrete.option">
+            <field name="name">10 mm</field><field name="option_type">tma</field>
+            <field name="sequence">1</field><field name="price_m3">45</field>
+        </record>
+        <record id="opt_tma_20" model="samblen.concrete.option">
+            <field name="name">20 mm</field><field name="option_type">tma</field>
+            <field name="sequence">2</field>
+        </record>
+        <record id="opt_tma_40" model="samblen.concrete.option">
+            <field name="name">40 mm</field><field name="option_type">tma</field>
+            <field name="sequence">3</field><field name="price_m3">-20</field>
+        </record>
+
+        <record id="opt_rev_10" model="samblen.concrete.option">
+            <field name="name">10 cm</field><field name="option_type">rev</field>
+            <field name="sequence">1</field>
+        </record>
+        <record id="opt_rev_14" model="samblen.concrete.option">
+            <field name="name">14 cm</field><field name="option_type">rev</field>
+            <field name="sequence">2</field>
+        </record>
+        <record id="opt_rev_18" model="samblen.concrete.option">
+            <field name="name">18 cm (bombeable)</field><field name="option_type">rev</field>
+            <field name="sequence">3</field><field name="price_m3">35</field>
+        </record>
+        <record id="opt_rev_auto" model="samblen.concrete.option">
+            <field name="name">Autocompactable (65 cm extensibilidad)</field>
+            <field name="option_type">rev</field>
+            <field name="sequence">4</field><field name="price_m3">180</field>
+        </record>
+
+        <record id="opt_add_acel" model="samblen.concrete.option">
+            <field name="name">Acelerante de fraguado</field><field name="option_type">additive</field>
+            <field name="price_m3">95</field>
+        </record>
+        <record id="opt_add_ret" model="samblen.concrete.option">
+            <field name="name">Retardante de fraguado</field><field name="option_type">additive</field>
+            <field name="price_m3">70</field>
+        </record>
+        <record id="opt_add_imp" model="samblen.concrete.option">
+            <field name="name">Impermeabilizante integral</field><field name="option_type">additive</field>
+            <field name="price_m3">110</field>
+        </record>
+        <record id="opt_add_fpp" model="samblen.concrete.option">
+            <field name="name">Fibra de polipropileno</field><field name="option_type">additive</field>
+            <field name="price_m3">85</field>
+        </record>
+        <record id="opt_add_fmet" model="samblen.concrete.option">
+            <field name="name">Fibra metálica</field><field name="option_type">additive</field>
+            <field name="price_m3">320</field>
+        </record>
+
+        <record id="opt_tiro_directo" model="samblen.concrete.option">
+            <field name="name">Directo de olla</field><field name="option_type">tiro</field>
+            <field name="sequence">1</field>
+        </record>
+        <record id="opt_tiro_canalon" model="samblen.concrete.option">
+            <field name="name">Con canalón (hasta 6 m)</field><field name="option_type">tiro</field>
+            <field name="sequence">2</field><field name="price_fixed">450</field>
+        </record>
+        <record id="opt_tiro_pluma" model="samblen.concrete.option">
+            <field name="name">Bomba pluma 32 m</field><field name="option_type">tiro</field>
+            <field name="sequence">3</field><field name="price_fixed">4500</field>
+            <field name="price_m3">60</field>
+        </record>
+        <record id="opt_tiro_estac" model="samblen.concrete.option">
+            <field name="name">Bomba estacionaria</field><field name="option_type">tiro</field>
+            <field name="sequence">4</field><field name="price_fixed">3800</field>
+            <field name="price_m3">55</field>
+        </record>
+    </data>
+</odoo>

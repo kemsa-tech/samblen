@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Samblen Comercial',
-    'version': '19.0.1.0.0',
+    'version': '19.0.1.1.0',
     'category': 'Sales',
     'summary': 'Cotizador de concreto y prefabricados: bombeo, turnos, topes de descuento y aprobación (Fase 1)',
     'description': """
@@ -18,10 +18,13 @@ Módulo Comercial para Samblen (Fase 1 - Módulo 1 del RFP)
     'depends': ['sale_management', 'samblen_concretera'],
     'data': [
         'security/samblen_comercial_security.xml',
+        'security/ir.model.access.csv',
         'data/product_data.xml',
+        'data/concrete_option_data.xml',
         'views/res_users_views.xml',
         'views/product_template_views.xml',
         'views/sale_order_views.xml',
+        'views/concrete_option_views.xml',
     ],
     'installable': True,
 }

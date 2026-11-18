@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_concrete_option_list" model="ir.ui.view">
+        <field name="name">samblen.concrete.option.list</field>
+        <field name="model">samblen.concrete.option</field>
+        <field name="arch" type="xml">
+            <list string="Opciones del cotizador" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="option_type"/>
+                <field name="name"/>
+                <field name="price_m3"/>
+                <field name="price_fixed"/>
+                <field name="product_id" optional="hide"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_concrete_option_search" model="ir.ui.view">
+        <field name="name">samblen.concrete.option.search</field>
+        <field name="model">samblen.concrete.option</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <filter name="g_type" string="Tipo" context="{'group_by': 'option_type'}"/>
+            </search>
+        </field>
+    </record>
+    <record id="action_concrete_option" model="ir.actions.act_window">
+        <field name="name">Opciones del cotizador de concreto</field>
+        <field name="res_model">samblen.concrete.option</field>
+        <field name="view_mode">list</field>
+        <field name="context">{'search_default_g_type': 1}</field>
+    </record>
+    <menuitem id="menu_concrete_option_sale" name="Opciones de concreto"
+              parent="sale.menu_sale_config" action="action_concrete_option" sequence="91"/>
+    <menuitem id="menu_concrete_option_conc" name="Opciones del cotizador"
+              parent="samblen_concretera.menu_concretera_config"
+              action="action_concrete_option" sequence="20"/>
+</odoo>
