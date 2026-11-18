@@ -123,8 +123,27 @@ def _receive(delivery):
         method()
 
 
+def _setup_company(env):
+    """Empresa demo en México con catálogo de cuentas e IVA mexicanos."""
+    company = env.company
+    mx = env.ref('base.mx')
+    pue = env['res.country.state'].search(
+        [('country_id', '=', mx.id), ('code', '=', 'PUE')], limit=1)
+    company.write({'name': 'Grupo Samblen (DEMO)', 'country_id': mx.id,
+                   'state_id': pue.id or False, 'city': 'Santa Isabel Cholula',
+                   'street': 'Carr. Federal Puebla-Atlixco km 20'})
+    if company.chart_template != 'mx' and not env['account.move.line'].search_count(
+            [('company_id', '=', company.id)]):
+        try:
+            with env.cr.savepoint():
+                env['account.chart.template'].try_loading('mx', company)
+        except Exception as e:  # noqa: BLE001
+            _logger.warning('Demo Samblen: no se cargó el catálogo MX: %s', e)
+
+
 def post_init_hook(env):
     rng = random.Random(2026)
+    _setup_company(env)
     designs, products = _create_designs(env)
     _create_fleet(env)
 

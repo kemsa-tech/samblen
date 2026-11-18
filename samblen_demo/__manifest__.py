@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Samblen - Datos de demostración',
-    'version': '19.0.1.1.1',
+    'version': '19.0.1.2.0',
     'category': 'Hidden',
     'summary': 'Escenario de demostración: clientes, obras, diseños, ollas, cotizaciones y surtimientos',
     'description': """
@@ -28,7 +28,7 @@ desarrollo o staging, nunca en producción.
     'license': 'LGPL-3',
     'depends': ['samblen_concretera', 'samblen_comercial', 'crm', 'purchase',
                 'stock', 'project', 'maintenance', 'hr', 'hr_attendance',
-                'account'],
+                'account', 'l10n_mx'],
     'data': ['views/demo_views.xml'],
     'post_init_hook': 'post_init_hook',
     'installable': True,
