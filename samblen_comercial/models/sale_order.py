@@ -243,6 +243,12 @@ class SaleOrder(models.Model):
                 self._remove_charge_line(zone_p.product_variant_id)
         return True
 
+    def action_compute_freight(self):
+        # El flete de concreto no aplica a cotizaciones de prefabricados
+        concrete = self.filtered(lambda o: o.samblen_quote_type != 'prefab')
+        return super(SaleOrder, concrete).action_compute_freight() \
+            if concrete else True
+
     def action_compute_prefab(self):
         """Flete por viajes según peso y fecha estimada de entrega."""
         self.ensure_one()
