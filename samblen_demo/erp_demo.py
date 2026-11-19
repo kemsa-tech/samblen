@@ -7,7 +7,9 @@ a correr después desde Concretera > Configuración > Cargar datos demo.
 """
 import logging
 import random
-from datetime import timedelta
+from datetime import datetime, timedelta
+
+import pytz
 
 from odoo import fields
 
@@ -63,6 +65,18 @@ HELPDESK = [
     ('Alta de usuario para nuevo residente', '1'),
     ('Impresora de etiquetas QR no imprime en almacén', '1'),
 ]
+
+
+DEMO_TZ = 'America/Mexico_City'
+
+
+def _local(env, dt, hour, minute=0):
+    """Hora local de la planta (zona del usuario o CDMX) del día de `dt`,
+    devuelta en UTC sin tzinfo, como la guarda Odoo."""
+    tz = pytz.timezone(env.user.tz or DEMO_TZ)
+    day = pytz.utc.localize(dt).astimezone(tz).date()
+    local = tz.localize(datetime(day.year, day.month, day.day, hour, minute))
+    return local.astimezone(pytz.utc).replace(tzinfo=None)
 
 
 def _done(env, key):
@@ -413,6 +427,8 @@ def _comercial(env):
     today = fields.Date.today()
     now = fields.Datetime.now()
     SO = env['sale.order'].with_context(samblen_no_followup=True)
+    for u in (env.user | env.ref('base.user_admin')).filtered(lambda u: not u.tz):
+        u.tz = DEMO_TZ
 
     # Zonas y lista de precios por cliente
     pl = env['product.pricelist'].create({
@@ -522,8 +538,8 @@ def _comercial(env):
     # Visitas a obra en el calendario (próximos días)
     for k, lead in enumerate(leads.filtered(
             lambda l: l.stage_id.name == 'Visita a obra')):
-        lead.visit_datetime = (now + timedelta(days=1 + k)).replace(
-            hour=10 + 2 * k, minute=0, second=0)
+        lead.visit_datetime = _local(env, now + timedelta(days=1 + k),
+                                     10 + 2 * k)
         lead.action_schedule_visit()
 
     # Cotizaciones de prefabricados desde CRM
@@ -564,8 +580,7 @@ def _comercial(env):
             'concrete_zone_id': zone.id, 'concrete_distance_km': zone.distance_km,
             'concrete_wait_minutes': wait, 'freight_retention': ret,
             'advance_pct': 50.0 if k else 100.0,
-            'concrete_pour_datetime': (now + timedelta(days=3 + k)).replace(
-                hour=8, minute=0, second=0),
+            'concrete_pour_datetime': _local(env, now + timedelta(days=3 + k), 8),
             'concrete_tma_option_id': env.ref('samblen_comercial.opt_tma_20').id
             if env.ref('samblen_comercial.opt_tma_20', False) else False,
             'order_line': [(0, 0, {'product_id': prod[d250.id].id,
@@ -578,11 +593,11 @@ def _comercial(env):
     future = 0
     for osc in oscs:
         if osc.state in ('done', 'partial', 'dosing'):
-            start = osc.date_order.replace(hour=7, minute=30, second=0)
+            start = _local(env, osc.date_order, 7, 30)
         else:
             future += 1
-            start = (now + timedelta(days=future)).replace(
-                hour=[7, 9, 11, 14][future % 4], minute=0, second=0)
+            start = _local(env, now + timedelta(days=future),
+                           [7, 9, 11, 13][future % 4])
         osc.write({'date_pour': start,
                    'date_pour_end': start + timedelta(hours=3)})
         if osc.sale_order_id and not osc.sale_order_id.concrete_pour_datetime:

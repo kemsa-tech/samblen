@@ -129,6 +129,9 @@ def _setup_company(env):
     mx = env.ref('base.mx')
     pue = env['res.country.state'].search(
         [('country_id', '=', mx.id), ('code', '=', 'PUE')], limit=1)
+    for user in (env.user | env.ref('base.user_admin')).filtered(
+            lambda u: not u.tz):
+        user.tz = 'America/Mexico_City'
     company.write({'name': 'Grupo Samblen (DEMO)', 'country_id': mx.id,
                    'state_id': pue.id or False, 'city': 'Santa Isabel Cholula',
                    'street': 'Carr. Federal Puebla-Atlixco km 20'})
