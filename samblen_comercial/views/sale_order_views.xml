@@ -6,7 +6,7 @@
         <field name="inherit_id" ref="samblen_concretera.view_order_form_concrete"/>
         <field name="arch" type="xml">
             <xpath expr="//button[@name='action_compute_freight']" position="replace">
-                <button name="action_compute_charges" type="object"
+                <button name="action_compute_all" type="object"
                         string="Calcular cargos" invisible="state in ('sale','cancel')"/>
                 <button name="action_request_discount_approval" type="object"
                         string="Solicitar aprobación de descuento" class="btn-primary"
@@ -20,13 +20,19 @@
                         invisible="discount_state != 'pending'"
                         groups="samblen_comercial.group_discount_approver"/>
             </xpath>
+            <xpath expr="//field[@name='concrete_design_id']" position="before">
+                <field name="samblen_quote_type" widget="radio" options="{'horizontal': true}"/>
+            </xpath>
+            <xpath expr="//field[@name='concrete_design_id']" position="attributes">
+                <attribute name="invisible">samblen_quote_type == 'prefab'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='concrete_tipo']" position="attributes">
+                <attribute name="invisible">samblen_quote_type == 'prefab'</attribute>
+            </xpath>
+            <xpath expr="//field[@name='concrete_obra']" position="after">
+                <field name="concrete_zone_id" options="{'no_create': True}"/>
+            </xpath>
             <xpath expr="//field[@name='concrete_tipo']" position="after">
-                <field name="concrete_tma_option_id" options="{'no_create': True}"/>
-                <field name="concrete_rev_option_id" options="{'no_create': True}"/>
-                <field name="concrete_additive_ids" widget="many2many_tags" options="{'no_create': True}"/>
-                <field name="concrete_tiro_id" options="{'no_create': True}"/>
-                <field name="concrete_pump" invisible="concrete_tiro_id"/>
-                <field name="concrete_shift"/>
                 <field name="max_line_discount"/>
                 <field name="discount_needs_approval" invisible="1"/>
                 <field name="discount_state" widget="badge"
@@ -34,6 +40,79 @@
                        decoration-success="discount_state == 'approved'"
                        decoration-danger="discount_state == 'rejected'"/>
                 <field name="discount_approver_id" invisible="not discount_approver_id"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Cotizador de concreto" name="samblen_concrete"
+                      invisible="samblen_quote_type != 'concrete'">
+                    <group>
+                        <group string="Especificación técnica">
+                            <field name="concrete_tma_option_id" options="{'no_create': True}"/>
+                            <field name="concrete_rev_option_id" options="{'no_create': True}"/>
+                            <field name="concrete_additive_ids" widget="many2many_tags" options="{'no_create': True}"/>
+                            <field name="concrete_tiro_id" options="{'no_create': True}"/>
+                            <field name="concrete_pump" invisible="concrete_tiro_id"/>
+                        </group>
+                        <group string="Colado">
+                            <field name="concrete_pour_datetime"/>
+                            <field name="concrete_pour_hours" widget="float_time"/>
+                            <field name="concrete_shift"/>
+                            <field name="concrete_wait_minutes"/>
+                        </group>
+                    </group>
+                </page>
+                <page string="Prefabricados" name="samblen_prefab"
+                      invisible="samblen_quote_type != 'prefab'">
+                    <group>
+                        <group string="Logística">
+                            <field name="prefab_weight_total"/>
+                            <field name="prefab_trips"/>
+                            <field name="prefab_ready_date"/>
+                        </group>
+                    </group>
+                    <p class="text-muted">Agrega las piezas en Líneas de la orden
+                        y pulsa "Calcular cargos": se agrega el flete por viajes
+                        y la fecha de entrega según existencias.</p>
+                </page>
+                <page string="Condiciones de pago" name="samblen_payment">
+                    <group>
+                        <group>
+                            <field name="advance_pct"/>
+                            <field name="advance_amount"/>
+                        </group>
+                        <group>
+                            <field name="freight_retention"/>
+                            <field name="retention_amount" invisible="not freight_retention"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_order_tree_comercial" model="ir.ui.view">
+        <field name="name">sale.order.list.samblen.comercial</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="samblen_quote_type" optional="show"/>
+                <field name="concrete_obra" optional="show"/>
+                <field name="concrete_pour_datetime" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_order_search_comercial" model="ir.ui.view">
+        <field name="name">sale.order.search.samblen.comercial</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <filter name="f_concrete" string="Concreto"
+                        domain="[('samblen_quote_type','=','concrete')]"/>
+                <filter name="f_prefab" string="Prefabricados"
+                        domain="[('samblen_quote_type','=','prefab')]"/>
             </xpath>
         </field>
     </record>

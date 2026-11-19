@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import math
+from datetime import timedelta
+
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
@@ -25,6 +28,35 @@ class SaleOrder(models.Model):
     concrete_tiro_id = fields.Many2one(
         'samblen.concrete.option', string='Tipo de tiro',
         domain=[('option_type', '=', 'tiro')])
+    samblen_quote_type = fields.Selection([
+        ('concrete', 'Concreto premezclado'),
+        ('prefab', 'Prefabricados'),
+    ], string='Tipo de cotización', default='concrete', required=True)
+    concrete_zone_id = fields.Many2one('samblen.commercial.zone',
+                                       string='Zona')
+    concrete_wait_minutes = fields.Float(
+        string='Tiempo estimado en obra (min)',
+        help='Minutos que la olla espera en obra. Lo que pase de los minutos '
+             'libres se cobra por hora.')
+    concrete_pour_datetime = fields.Datetime(string='Fecha y hora de colado')
+    concrete_pour_hours = fields.Float(string='Duración del colado (h)',
+                                       default=3.0)
+    advance_pct = fields.Float(string='Anticipo (%)')
+    advance_amount = fields.Monetary(string='Anticipo',
+                                     compute='_compute_advance')
+    freight_retention = fields.Boolean(
+        string='Retener 4% IVA del flete',
+        help='Cliente persona moral: retiene 4% de IVA sobre el flete.')
+    retention_amount = fields.Monetary(string='Retención estimada',
+                                       compute='_compute_advance')
+    prefab_weight_total = fields.Float(string='Peso total (kg)',
+                                       compute='_compute_prefab_info')
+    prefab_trips = fields.Integer(string='Viajes de flete',
+                                  compute='_compute_prefab_info')
+    prefab_ready_date = fields.Date(
+        string='Entrega estimada',
+        help='Según existencias y días de fabricación de cada pieza.',
+        compute='_compute_prefab_info')
     max_line_discount = fields.Float(
         string='Descuento máximo (%)', compute='_compute_max_line_discount')
     discount_state = fields.Selection([
@@ -51,6 +83,69 @@ class SaleOrder(models.Model):
             approved = (order.discount_state == 'approved'
                         and disc <= order.discount_approved_value)
             order.discount_needs_approval = disc > tope and not approved
+
+    @api.depends('amount_total', 'advance_pct', 'freight_retention',
+                 'order_line.price_subtotal')
+    def _compute_advance(self):
+        flete = self.env.ref('samblen_concretera.product_flete',
+                             raise_if_not_found=False)
+        prefab_fl = self.env['product.template'].search(
+            [('samblen_charge_type', '=', 'prefab_freight')])
+        for order in self:
+            order.advance_amount = order.amount_total * order.advance_pct / 100.0
+            fl_lines = order.order_line.filtered(
+                lambda l: l.product_id.product_tmpl_id in (flete | prefab_fl))
+            order.retention_amount = (sum(fl_lines.mapped('price_subtotal'))
+                                      * 0.04 if order.freight_retention else 0.0)
+
+    def _prefab_lines(self):
+        return self.order_line.filtered(
+            lambda l: l.product_id.product_tmpl_id.is_prefab)
+
+    @api.depends('order_line.product_uom_qty', 'order_line.product_id')
+    def _compute_prefab_info(self):
+        truck = self.env['product.template'].search(
+            [('samblen_charge_type', '=', 'prefab_freight')], limit=1)
+        cap = truck.truck_capacity_kg or 20000.0
+        today = fields.Date.context_today(self)
+        for order in self:
+            lines = order._prefab_lines()
+            weight = sum(l.product_uom_qty * l.product_id.prefab_weight_kg
+                         for l in lines)
+            days = 0
+            for l in lines:
+                p = l.product_id
+                short = p.is_storable and p.qty_available < l.product_uom_qty
+                if short or not p.is_storable:
+                    days = max(days, p.prefab_lead_days or 0)
+            order.prefab_weight_total = weight
+            order.prefab_trips = math.ceil(weight / cap) if weight else 0
+            order.prefab_ready_date = (today + timedelta(days=days + 1)
+                                       if lines else False)
+
+    @api.onchange('concrete_zone_id')
+    def _onchange_concrete_zone(self):
+        zone = self.concrete_zone_id
+        if zone:
+            if zone.distance_km and not self.concrete_distance_km:
+                self.concrete_distance_km = zone.distance_km
+            if zone.pricelist_id:
+                self.pricelist_id = zone.pricelist_id
+
+    @api.onchange('concrete_pour_datetime')
+    def _onchange_pour_datetime(self):
+        if self.concrete_pour_datetime:
+            self.commitment_date = self.concrete_pour_datetime
+            wd = fields.Datetime.context_timestamp(
+                self, self.concrete_pour_datetime)
+            if wd.weekday() == 6:
+                self.concrete_shift = 'sunday'
+            elif wd.hour >= 20 or wd.hour < 6:
+                self.concrete_shift = 'night'
+
+    def _charge_product(self, ctype):
+        return self.env['product.template'].search(
+            [('samblen_charge_type', '=', ctype)], limit=1)
 
     # ---------- Cargos automáticos ----------
     def _set_charge_line(self, product, qty, price, label):
@@ -106,7 +201,90 @@ class SaleOrder(models.Model):
                                   round(base * pct / 100.0, 2), label)
         else:
             self._remove_charge_line(shift.product_variant_id)
+
+        # Carga mínima
+        short = self._charge_product('short_load')
+        if short:
+            missing = short.min_load_m3 - m3
+            if m3 and missing > 0:
+                self._set_charge_line(
+                    short.product_variant_id, missing, short.list_price,
+                    _('Carga incompleta: %.1f m3 faltantes para la carga '
+                      'mínima de %.1f m3') % (missing, short.min_load_m3))
+            else:
+                self._remove_charge_line(short.product_variant_id)
+        # Tiempo de espera
+        wait = self._charge_product('wait')
+        if wait:
+            extra_h = max(0.0, (self.concrete_wait_minutes or 0.0)
+                          - wait.wait_free_minutes) / 60.0
+            if extra_h:
+                self._set_charge_line(
+                    wait.product_variant_id, round(extra_h, 2),
+                    wait.list_price,
+                    _('Tiempo de espera: %.0f min (libres %.0f)') % (
+                        self.concrete_wait_minutes, wait.wait_free_minutes))
+            else:
+                self._remove_charge_line(wait.product_variant_id)
+        # Ajuste por zona sobre el importe de concreto
+        zone_p = self._charge_product('zone')
+        if zone_p:
+            concrete_lines = self.order_line.filtered(
+                lambda l: l.product_id.product_tmpl_id.is_concrete)
+            base = sum(concrete_lines.mapped('price_subtotal'))
+            pct = self.concrete_zone_id.price_adjust_pct
+            if pct and base:
+                self._set_charge_line(
+                    zone_p.product_variant_id, 1.0,
+                    round(base * pct / 100.0, 2),
+                    _('Ajuste zona %s (%+.1f%%)') % (
+                        self.concrete_zone_id.name, pct))
+            else:
+                self._remove_charge_line(zone_p.product_variant_id)
         return True
+
+    def action_compute_prefab(self):
+        """Flete por viajes según peso y fecha estimada de entrega."""
+        self.ensure_one()
+        if not self._prefab_lines():
+            raise UserError(_('Agrega piezas prefabricadas a la cotización.'))
+        truck = self._charge_product('prefab_freight')
+        if truck:
+            if self.prefab_trips:
+                self._set_charge_line(
+                    truck.product_variant_id, self.prefab_trips,
+                    truck.list_price,
+                    _('Flete prefabricados: %d viaje(s), %.0f kg') % (
+                        self.prefab_trips, self.prefab_weight_total))
+            else:
+                self._remove_charge_line(truck.product_variant_id)
+        if self.prefab_ready_date:
+            self.commitment_date = fields.Datetime.to_datetime(
+                self.prefab_ready_date).replace(hour=15)
+        return True
+
+    def action_compute_all(self):
+        for order in self:
+            if order.samblen_quote_type == 'prefab':
+                order.action_compute_prefab()
+            else:
+                order.action_compute_charges()
+        return True
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        orders = super().create(vals_list)
+        if not self.env.context.get('samblen_no_followup'):
+            act = self.env.ref('samblen_comercial.activity_quote_followup',
+                               raise_if_not_found=False)
+            for order in orders:
+                if act and order.user_id:
+                    order.activity_schedule(
+                        activity_type_id=act.id, user_id=order.user_id.id,
+                        date_deadline=fields.Date.context_today(order)
+                        + timedelta(days=3),
+                        summary=_('Dar seguimiento a la cotización'))
+        return orders
 
     # ---------- Circuito de aprobación ----------
     def _discount_approvers(self):
@@ -173,8 +351,13 @@ class SaleOrder(models.Model):
             vals['tma'] = self.concrete_tma_option_id.name
         if self.concrete_rev_option_id:
             vals['revenimiento'] = self.concrete_rev_option_id.name
+        if self.concrete_pour_datetime:
+            vals['date_pour'] = self.concrete_pour_datetime
+            vals['date_pour_end'] = self.concrete_pour_datetime + timedelta(
+                hours=self.concrete_pour_hours or 3.0)
         if vals:
             osc.write(vals)
+        osc._notify_plant()
         extras = self.concrete_additive_ids.mapped('name')
         if extras or self.concrete_tiro_id:
             osc.message_post(body=_('Dosificación técnica: aditivos %s; tiro %s.') % (

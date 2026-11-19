@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Tarifas de ejemplo: ajustar con la política real de Samblen -->
+        <record id="product_carga_incompleta" model="product.template">
+            <field name="name">Carga incompleta (m3 faltante)</field>
+            <field name="type">service</field>
+            <field name="list_price">650.0</field>
+            <field name="samblen_charge_type">short_load</field>
+            <field name="min_load_m3">3.0</field>
+            <field name="invoice_policy">order</field>
+        </record>
+        <record id="product_tiempo_espera" model="product.template">
+            <field name="name">Tiempo de espera de olla (hora)</field>
+            <field name="type">service</field>
+            <field name="list_price">900.0</field>
+            <field name="samblen_charge_type">wait</field>
+            <field name="wait_free_minutes">60.0</field>
+            <field name="invoice_policy">order</field>
+        </record>
+        <record id="product_flete_prefab" model="product.template">
+            <field name="name">Flete de prefabricados (viaje)</field>
+            <field name="type">service</field>
+            <field name="list_price">2800.0</field>
+            <field name="samblen_charge_type">prefab_freight</field>
+            <field name="truck_capacity_kg">20000.0</field>
+            <field name="invoice_policy">order</field>
+        </record>
+        <record id="product_ajuste_zona" model="product.template">
+            <field name="name">Ajuste por zona</field>
+            <field name="type">service</field>
+            <field name="list_price">0.0</field>
+            <field name="samblen_charge_type">zone</field>
+            <field name="invoice_policy">order</field>
+        </record>
+
+        <record id="stage_visita" model="crm.stage">
+            <field name="name">Visita a obra</field>
+            <field name="sequence">2</field>
+        </record>
+
+        <record id="utm_source_llamada" model="utm.source">
+            <field name="name">Llamada</field>
+        </record>
+        <record id="utm_source_visita" model="utm.source">
+            <field name="name">Visita de vendedor</field>
+        </record>
+        <record id="utm_source_constructora" model="utm.source">
+            <field name="name">Recomendación de constructora</field>
+        </record>
+        <record id="utm_source_licitacion" model="utm.source">
+            <field name="name">Licitación pública</field>
+        </record>
+    </data>
+
+    <record id="activity_quote_followup" model="mail.activity.type">
+        <field name="name">Seguimiento de cotización</field>
+        <field name="res_model">sale.order</field>
+        <field name="icon">fa-phone</field>
+        <field name="delay_count">3</field>
+    </record>
+</odoo>

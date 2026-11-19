@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_osc_form_agenda" model="ir.ui.view">
+        <field name="name">concrete.supply.order.form.agenda</field>
+        <field name="model">concrete.supply.order</field>
+        <field name="inherit_id" ref="samblen_concretera.view_concrete_supply_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='date_order']" position="after">
+                <field name="date_pour"/>
+                <field name="date_pour_end"/>
+                <field name="user_id"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_osc_list_agenda" model="ir.ui.view">
+        <field name="name">concrete.supply.order.list.agenda</field>
+        <field name="model">concrete.supply.order</field>
+        <field name="inherit_id" ref="samblen_concretera.view_concrete_supply_order_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='obra']" position="after">
+                <field name="date_pour" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_osc_calendar" model="ir.ui.view">
+        <field name="name">concrete.supply.order.calendar</field>
+        <field name="model">concrete.supply.order</field>
+        <field name="arch" type="xml">
+            <calendar string="Agenda de colados" date_start="date_pour"
+                      date_stop="date_pour_end" color="partner_id" mode="week"
+                      event_open_popup="1" quick_create="0">
+                <field name="partner_id"/>
+                <field name="obra"/>
+                <field name="qty_m3"/>
+                <field name="design_id"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+    <record id="view_osc_gantt" model="ir.ui.view">
+        <field name="name">concrete.supply.order.gantt</field>
+        <field name="model">concrete.supply.order</field>
+        <field name="arch" type="xml">
+            <gantt string="Programa de colados" date_start="date_pour"
+                   date_stop="date_pour_end" default_group_by="design_id"
+                   default_scale="week" color="partner_id">
+                <field name="partner_id"/>
+                <field name="qty_m3"/>
+            </gantt>
+        </field>
+    </record>
+    <record id="action_pour_agenda" model="ir.actions.act_window">
+        <field name="name">Agenda de colados</field>
+        <field name="res_model">concrete.supply.order</field>
+        <field name="view_mode">calendar,gantt,list,form</field>
+        <field name="domain">[('date_pour', '!=', False)]</field>
+    </record>
+    <menuitem id="menu_pour_agenda" name="Agenda de colados"
+              parent="samblen_concretera.menu_concretera_root"
+              action="action_pour_agenda" sequence="5"/>
+    <menuitem id="menu_pour_agenda_sale" name="Agenda de colados"
+              parent="sale.sale_order_menu" action="action_pour_agenda" sequence="50"/>
+
+    <record id="view_delivery_gantt" model="ir.ui.view">
+        <field name="name">concrete.delivery.gantt</field>
+        <field name="model">concrete.delivery</field>
+        <field name="arch" type="xml">
+            <gantt string="Ocupación de ollas" date_start="date_load"
+                   date_stop="date_return" default_group_by="vehicle_id"
+                   default_scale="day" color="order_id">
+                <field name="order_id"/>
+                <field name="volume_m3"/>
+            </gantt>
+        </field>
+    </record>
+    <record id="action_olla_gantt" model="ir.actions.act_window">
+        <field name="name">Ocupación de ollas</field>
+        <field name="res_model">concrete.delivery</field>
+        <field name="view_mode">gantt,list,form</field>
+        <field name="view_id" ref="view_delivery_gantt"/>
+        <field name="domain">[('date_load', '!=', False)]</field>
+    </record>
+    <menuitem id="menu_olla_gantt" name="Ocupación de ollas"
+              parent="samblen_concretera.menu_concretera_root"
+              action="action_olla_gantt" sequence="6"/>
+</odoo>

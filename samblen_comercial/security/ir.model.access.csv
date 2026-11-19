@@ -1,3 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_concrete_option_user,concrete.option.user,model_samblen_concrete_option,base.group_user,1,0,0,0
 access_concrete_option_manager,concrete.option.manager,model_samblen_concrete_option,sales_team.group_sale_manager,1,1,1,1
+access_commercial_zone_user,commercial.zone.user,model_samblen_commercial_zone,base.group_user,1,0,0,0
+access_commercial_zone_manager,commercial.zone.manager,model_samblen_commercial_zone,sales_team.group_sale_manager,1,1,1,1

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_samblen_quote" model="ir.actions.report">
+        <field name="name">Cotización Samblen</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">samblen_comercial.report_samblen_quote</field>
+        <field name="report_file">samblen_comercial.report_samblen_quote</field>
+        <field name="print_report_name">'Cotizacion %s - %s' % (object.name, object.partner_id.name)</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_samblen_quote_document">
+        <t t-call="web.external_layout">
+            <t t-set="o" t-value="doc"/>
+            <div class="page">
+                <h2>
+                    <t t-if="doc.samblen_quote_type == 'prefab'">Cotización de prefabricados</t>
+                    <t t-else="">Cotización de concreto premezclado</t>
+                    <span t-field="doc.name"/>
+                </h2>
+                <div class="row mt-3 mb-3">
+                    <div class="col-6">
+                        <strong>Cliente</strong><br/>
+                        <span t-field="doc.partner_id"/><br/>
+                        <span t-if="doc.partner_id.vat">RFC: <span t-field="doc.partner_id.vat"/></span>
+                    </div>
+                    <div class="col-6">
+                        <strong>Obra:</strong> <span t-field="doc.concrete_obra"/><br/>
+                        <t t-if="doc.concrete_zone_id"><strong>Zona:</strong> <span t-field="doc.concrete_zone_id"/><br/></t>
+                        <t t-if="doc.concrete_distance_km"><strong>Distancia:</strong> <span t-field="doc.concrete_distance_km"/> km<br/></t>
+                        <strong>Fecha:</strong> <span t-field="doc.date_order" t-options="{'widget': 'date'}"/><br/>
+                        <strong>Vendedor:</strong> <span t-field="doc.user_id"/>
+                    </div>
+                </div>
+                <div t-if="doc.samblen_quote_type == 'concrete'" class="mb-3">
+                    <strong>Especificación:</strong>
+                    <span t-field="doc.concrete_design_id"/>
+                    <t t-if="doc.concrete_tma_option_id"> · TMA <span t-field="doc.concrete_tma_option_id"/></t>
+                    <t t-if="doc.concrete_rev_option_id"> · Rev. <span t-field="doc.concrete_rev_option_id"/></t>
+                    <t t-if="doc.concrete_additive_ids"> · Aditivos: <t t-esc="', '.join(doc.concrete_additive_ids.mapped('name'))"/></t>
+                    <t t-if="doc.concrete_tiro_id"> · Tiro: <span t-field="doc.concrete_tiro_id"/></t>
+                    <br/>
+                    <t t-if="doc.concrete_pour_datetime"><strong>Colado programado:</strong> <span t-field="doc.concrete_pour_datetime"/> (<span t-field="doc.concrete_shift"/>)</t>
+                </div>
+                <div t-if="doc.samblen_quote_type == 'prefab'" class="mb-3">
+                    <strong>Peso total:</strong> <span t-esc="'{:,.0f}'.format(doc.prefab_weight_total)"/> kg ·
+                    <strong>Viajes:</strong> <span t-field="doc.prefab_trips"/> ·
+                    <strong>Entrega estimada:</strong> <span t-field="doc.prefab_ready_date"/>
+                </div>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Concepto</th>
+                            <th class="text-end">Cantidad</th>
+                            <th class="text-end">Precio unitario</th>
+                            <th class="text-end">Desc. %</th>
+                            <th class="text-end">Importe</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="doc.order_line.filtered(lambda l: not l.display_type)" t-as="line">
+                            <td><span t-field="line.name"/></td>
+                            <td class="text-end"><span t-field="line.product_uom_qty"/> <span t-field="line.product_uom_id"/></td>
+                            <td class="text-end"><span t-field="line.price_unit"/></td>
+                            <td class="text-end"><span t-field="line.discount"/></td>
+                            <td class="text-end"><span t-field="line.price_subtotal"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <div class="col-6 offset-6">
+                        <table class="table table-sm">
+                            <tr><td>Subtotal</td><td class="text-end"><span t-field="doc.amount_untaxed"/></td></tr>
+                            <tr><td>IVA</td><td class="text-end"><span t-field="doc.amount_tax"/></td></tr>
+                            <tr t-if="doc.retention_amount"><td>Retención IVA flete (4%)</td><td class="text-end">-<span t-field="doc.retention_amount"/></td></tr>
+                            <tr><td><strong>Total</strong></td><td class="text-end"><strong><span t-field="doc.amount_total"/></strong></td></tr>
+                            <tr t-if="doc.advance_amount"><td>Anticipo (<span t-field="doc.advance_pct"/>%)</td><td class="text-end"><span t-field="doc.advance_amount"/></td></tr>
+                        </table>
+                    </div>
+                </div>
+                <h5 class="mt-3">Condiciones</h5>
+                <ul>
+                    <li>Vigencia: <span t-if="doc.validity_date" t-field="doc.validity_date"/><span t-else="">15 días naturales</span>.</li>
+                    <t t-if="doc.samblen_quote_type == 'concrete'">
+                        <li>Cargas menores a la carga mínima se cobran como carga incompleta.</li>
+                        <li>Tiempo de espera en obra fuera del tiempo libre se cobra por hora.</li>
+                        <li>El colado se programa al recibir el anticipo y la confirmación de la obra.</li>
+                    </t>
+                    <t t-else="">
+                        <li>Fecha de entrega sujeta a existencias al confirmar el pedido.</li>
+                        <li>Descarga a pie de camión; maniobras adicionales se cotizan aparte.</li>
+                    </t>
+                    <li>Precios en pesos mexicanos.</li>
+                </ul>
+                <div t-if="doc.note" t-field="doc.note"/>
+            </div>
+        </t>
+    </template>
+
+    <template id="report_samblen_quote">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="samblen_comercial.report_samblen_quote_document"/>
+            </t>
+        </t>
+    </template>
+</odoo>

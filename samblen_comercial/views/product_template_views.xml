@@ -13,6 +13,16 @@
                         <field name="is_shift_surcharge"/>
                         <field name="shift_night_pct" invisible="not is_shift_surcharge"/>
                         <field name="shift_sunday_pct" invisible="not is_shift_surcharge"/>
+                        <field name="samblen_charge_type"/>
+                        <field name="min_load_m3" invisible="samblen_charge_type != 'short_load'"/>
+                        <field name="wait_free_minutes" invisible="samblen_charge_type != 'wait'"/>
+                        <field name="truck_capacity_kg" invisible="samblen_charge_type != 'prefab_freight'"/>
+                    </group>
+                    <group string="Prefabricado" invisible="not is_prefab">
+                        <field name="prefab_family"/>
+                        <field name="prefab_unit"/>
+                        <field name="prefab_weight_kg"/>
+                        <field name="prefab_lead_days"/>
                     </group>
                 </page>
             </xpath>
@@ -23,9 +33,17 @@
         <field name="res_model">product.template</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="domain">[('is_prefab', '=', True)]</field>
-        <field name="context">{'default_is_prefab': True}</field>
+        <field name="context">{'default_is_prefab': True, 'group_by': 'prefab_family'}</field>
     </record>
     <menuitem id="menu_prefab_products" name="Prefabricados"
               parent="sale.product_menu_catalog" action="action_prefab_products"
               sequence="30"/>
+    <record id="action_commercial_tariffs" model="ir.actions.act_window">
+        <field name="name">Tarifas del cotizador</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">['|', '|', '|', ('samblen_charge_type', '!=', False), ('is_pump_service', '=', True), ('is_shift_surcharge', '=', True), ('freight_base', '!=', 0)]</field>
+    </record>
+    <menuitem id="menu_commercial_tariffs" name="Tarifas del cotizador"
+              parent="sale.menu_sale_config" action="action_commercial_tariffs" sequence="92"/>
 </odoo>

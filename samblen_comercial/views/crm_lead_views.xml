@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_crm_lead_form_samblen" model="ir.ui.view">
+        <field name="name">crm.lead.form.samblen</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_schedule_visit" type="object"
+                        string="Agendar visita a obra"
+                        invisible="type != 'opportunity' or visit_done"/>
+                <button name="action_quote_concrete" type="object"
+                        string="Cotizar concreto" class="btn-primary"
+                        invisible="type != 'opportunity' or samblen_interest == 'prefab'"/>
+                <button name="action_quote_prefab" type="object"
+                        string="Cotizar prefabricados"
+                        invisible="type != 'opportunity' or samblen_interest == 'concrete'"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Obra" name="samblen_obra">
+                    <group>
+                        <group string="Datos de la obra">
+                            <field name="samblen_interest"/>
+                            <field name="obra_name"/>
+                            <field name="obra_address"/>
+                            <field name="obra_type"/>
+                            <field name="obra_zone_id" options="{'no_create': True}"/>
+                            <field name="obra_distance_km"/>
+                        </group>
+                        <group string="Necesidad">
+                            <field name="concrete_design_id"
+                                   invisible="samblen_interest == 'prefab'"/>
+                            <field name="m3_estimated"
+                                   invisible="samblen_interest == 'prefab'"/>
+                            <field name="pour_date_estimated"/>
+                            <field name="visit_datetime"/>
+                            <field name="visit_done"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_crm_lead_kanban_samblen" model="ir.ui.view">
+        <field name="name">crm.lead.kanban.samblen</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_kanban_view_leads"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <div t-if="record.obra_name.raw_value" class="text-muted small">
+                    <field name="obra_name"/>
+                    <t t-if="record.m3_estimated.raw_value"> · <field name="m3_estimated"/> m3</t>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_crm_lead_search_samblen" model="ir.ui.view">
+        <field name="name">crm.lead.search.samblen</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.view_crm_case_opportunities_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <field name="obra_name"/>
+                <separator/>
+                <filter name="f_int_concrete" string="Concreto"
+                        domain="[('samblen_interest','in',('concrete','both'))]"/>
+                <filter name="f_int_prefab" string="Prefabricados"
+                        domain="[('samblen_interest','in',('prefab','both'))]"/>
+                <filter name="g_zone" string="Zona" context="{'group_by': 'obra_zone_id'}"/>
+                <filter name="g_obra_type" string="Tipo de obra" context="{'group_by': 'obra_type'}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

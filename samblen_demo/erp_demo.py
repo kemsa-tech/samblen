@@ -370,8 +370,242 @@ def _helpdesk(env):
                                        'priority': prio})
 
 
+# ------------------------------------- Cotizador, CRM de obra y agenda (M1)
+ZONES = [
+    ('Puebla centro', 'Puebla, San Andrés Cholula', 8, 0.0),
+    ('Cholula - Santa Isabel', 'San Pedro Cholula, Santa Isabel', 12, 0.0),
+    ('Corredor industrial Huejotzingo', 'Huejotzingo, San Martín', 25, 3.0),
+    ('Atlixco', 'Atlixco, Tianguismanalco', 35, 5.0),
+    ('Tlaxcala sur', 'Zacatelco, Tlaxcala capital', 40, 6.0),
+]
+
+PREFABS = [
+    # nombre, familia, unidad, peso kg, precio, días fabricación, existencia
+    ('Block hueco 15x20x40', 'block', 'pza', 13.5, 14.5, 3, 18000),
+    ('Block macizo 12x20x40', 'block', 'pza', 16.0, 16.8, 3, 6000),
+    ('Adoquín hexagonal 8 cm (m2)', 'adoquin', 'm2', 180.0, 245.0, 5, 900),
+    ('Adoquín rectangular 6 cm (m2)', 'adoquin', 'm2', 140.0, 210.0, 5, 400),
+    ('Tubo de concreto simple 30 cm x 1.25 m', 'tubo', 'pza', 140.0, 420.0, 7, 120),
+    ('Tubo de concreto reforzado 90 cm x 2.5 m', 'tubo', 'pza', 1650.0, 3850.0, 12, 10),
+    ('Poste de concreto 9 m', 'poste', 'pza', 750.0, 2900.0, 10, 25),
+    ('Trabe pretensada AASHTO tipo III 15 m', 'trabe', 'pza', 9800.0, 68000.0, 25, 0),
+    ('Vigueta pretensada 12-4 (ml)', 'losa', 'ml', 19.0, 68.0, 4, 3500),
+    ('Bovedilla de concreto 15x25x56', 'losa', 'pza', 11.0, 13.5, 3, 9000),
+    ('Guarnición trapezoidal 15x20x50 cm (ml)', 'otro', 'ml', 95.0, 185.0, 6, 300),
+]
+
+NEW_LEADS = [
+    # nombre, interés, tipo, zona idx, m3, resistencia, días, ingreso, fuente, etapa, es_lead
+    ('Losa de entrepiso edificio de oficinas', 'concrete', 'comercial', 0, 180, '250', 20, 342000, 'utm_source_llamada', 'Visita a obra', False),
+    ('Plaza comercial Atlixco - cimentación', 'both', 'comercial', 3, 420, '300', 35, 980000, 'utm_source_constructora', 'Calificado', False),
+    ('Fraccionamiento 80 viviendas Huejotzingo', 'both', 'fraccionamiento', 2, 900, '200', 45, 2100000, 'utm_source_visita', 'Propuesta', False),
+    ('Banquetas y guarniciones municipio Cholula', 'prefab', 'infraestructura', 1, 0, False, 30, 450000, 'utm_source_licitacion', 'Nuevo', False),
+    ('Barda perimetral bodega Tlaxcala', 'prefab', 'industrial', 4, 0, False, 15, 160000, 'utm_source_llamada', 'Visita a obra', False),
+    ('Ampliación nave automotriz - firme', 'concrete', 'industrial', 2, 650, '250', 25, 1230000, 'utm_source_constructora', 'Propuesta', False),
+    ('Casa habitación en Lomas de Angelópolis', 'concrete', 'vivienda', 0, 35, '250', 10, 68000, 'utm_source_llamada', 'Nuevo', True),
+    ('Pozos de visita drenaje sanitario', 'prefab', 'infraestructura', 3, 0, False, 40, 380000, 'utm_source_licitacion', 'Calificado', False),
+    ('Pavimento estacionamiento hospital', 'concrete', 'pavimento', 1, 300, '300', 30, 610000, 'utm_source_visita', 'Visita a obra', False),
+    ('Cisterna y losa de cimentación residencial', 'concrete', 'vivienda', 0, 22, '250', 8, 45000, 'utm_source_llamada', 'Nuevo', True),
+]
+
+
+def _comercial(env):
+    today = fields.Date.today()
+    now = fields.Datetime.now()
+    SO = env['sale.order'].with_context(samblen_no_followup=True)
+
+    # Zonas y lista de precios por cliente
+    pl = env['product.pricelist'].create({
+        'name': 'Constructoras preferentes (-3%)',
+        'item_ids': [(0, 0, {'applied_on': '3_global',
+                             'compute_price': 'percentage',
+                             'percent_price': 3.0})]})
+    zones = []
+    for i, (name, note, km, pct) in enumerate(ZONES):
+        zones.append(env['samblen.commercial.zone'].create({
+            'name': name, 'note': note, 'distance_km': km,
+            'price_adjust_pct': pct, 'sequence': i}))
+    customers = env['res.partner'].search([('customer_rank', '>', 0),
+                                           ('is_company', '=', True)], limit=8)
+    customers[:2].write({'property_product_pricelist': pl.id})
+
+    # Programación de planta: administrador y usuario actual
+    grp = env.ref('samblen_comercial.group_plant_scheduler')
+    users = env.user | env.ref('base.user_admin')
+    grp.write({'user_ids' if 'user_ids' in grp._fields else 'users':
+               [(4, u.id) for u in users]})
+
+    # Catálogo de prefabricados con existencias
+    wh = env['stock.warehouse'].search([('company_id', '=', env.company.id)],
+                                       limit=1)
+    prefab = {}
+    for name, fam, unit, kg, price, days, stock in PREFABS:
+        p = env['product.product'].create({
+            'name': name, 'type': 'consu', 'is_storable': True,
+            'is_prefab': True, 'prefab_family': fam, 'prefab_unit': unit,
+            'prefab_weight_kg': kg, 'prefab_lead_days': days,
+            'list_price': price, 'standard_price': round(price * 0.62, 2),
+            'invoice_policy': 'order'})
+        if stock and wh:
+            env['stock.quant']._update_available_quantity(
+                p, wh.lot_stock_id, stock)
+        prefab[name] = p
+    for xid, fam, kg, days in [('product_prefab_losa', 'losa', 230.0, 5),
+                               ('product_prefab_tubo', 'tubo', 520.0, 8)]:
+        t = env.ref('samblen_comercial.' + xid, False)
+        if t:
+            t.write({'prefab_family': fam, 'prefab_weight_kg': kg,
+                     'prefab_lead_days': days,
+                     'prefab_unit': 'm2' if fam == 'losa' else 'pza'})
+
+    # CRM: datos de obra en las oportunidades existentes
+    designs = {d.name: d for d in env['concrete.mix.design'].search([])}
+
+    def design(key):
+        for n, d in designs.items():
+            if key and key in n:
+                return d
+        return env['concrete.mix.design']
+    stages = {s.name: s for s in env['crm.stage'].search([])}
+    for i, lead in enumerate(env['crm.lead'].search([('obra_name', '=', False)])):
+        z = zones[i % len(zones)]
+        pre = any(w in lead.name.lower() for w in ('losa', 'tub', 'bordillo'))
+        lead.write({
+            'samblen_interest': 'prefab' if pre else 'concrete',
+            'obra_name': lead.name, 'obra_zone_id': z.id,
+            'obra_distance_km': z.distance_km,
+            'obra_address': z.note.split(',')[0] + ', Pue.',
+            'obra_type': 'fraccionamiento' if 'fracc' in lead.name.lower()
+            else 'industrial' if 'nave' in lead.name.lower() else 'comercial',
+            'm3_estimated': 0 if pre else round(lead.expected_revenue / 1850),
+            'concrete_design_id': False if pre else design('250').id,
+            'pour_date_estimated': today + timedelta(days=10 + i * 3)})
+    src = {x: env.ref('samblen_comercial.' + x, False) for x in
+           ('utm_source_llamada', 'utm_source_visita', 'utm_source_constructora',
+            'utm_source_licitacion')}
+    tag_c = env['crm.tag'].search([('name', '=', 'Concreto premezclado')], limit=1)
+    tag_p = env['crm.tag'].search([('name', '=', 'Prefabricados')], limit=1)
+    sellers = env['res.users'].search([('share', '=', False)], limit=3) or env.user
+    leads = env['crm.lead']
+    for i, (name, interest, otype, zi, m3, res, days, amount, source, stage,
+            is_lead) in enumerate(NEW_LEADS):
+        z = zones[zi]
+        partner = customers[i % len(customers)] if customers else False
+        vals = {
+            'name': name, 'type': 'lead' if is_lead else 'opportunity',
+            'partner_id': partner.id if partner and not is_lead else False,
+            'contact_name': 'Ing. ' + NAMES[i % len(NAMES)] if is_lead else False,
+            'phone': '222 %03d %04d' % (400 + i, 1000 + i * 37),
+            'samblen_interest': interest, 'obra_name': name,
+            'obra_type': otype, 'obra_zone_id': z.id,
+            'obra_distance_km': z.distance_km,
+            'obra_address': z.note.split(',')[0] + ', Pue.',
+            'm3_estimated': m3, 'concrete_design_id': design(res).id,
+            'pour_date_estimated': today + timedelta(days=days),
+            'expected_revenue': amount,
+            'source_id': src[source].id if src.get(source) else False,
+            'user_id': sellers[i % len(sellers)].id,
+            'tag_ids': [(6, 0, [t.id for t in
+                                ((tag_c if interest != 'prefab' else
+                                  env['crm.tag']) |
+                                 (tag_p if interest != 'concrete' else
+                                  env['crm.tag']))])],
+        }
+        if not is_lead and stage in stages:
+            vals['stage_id'] = stages[stage].id
+        lead = env['crm.lead'].create(vals)
+        leads |= lead
+        if is_lead:
+            lead.activity_schedule('mail.mail_activity_data_call',
+                                   summary='Calificar prospecto y pedir ubicación de obra',
+                                   user_id=lead.user_id.id)
+    # Visitas a obra en el calendario (próximos días)
+    for k, lead in enumerate(leads.filtered(
+            lambda l: l.stage_id.name == 'Visita a obra')):
+        lead.visit_datetime = (now + timedelta(days=1 + k)).replace(
+            hour=10 + 2 * k, minute=0, second=0)
+        lead.action_schedule_visit()
+
+    # Cotizaciones de prefabricados desde CRM
+    pre_leads = leads.filtered(lambda l: l.samblen_interest != 'concrete'
+                               and l.partner_id)[:3]
+    baskets = [
+        [('Guarnición trapezoidal 15x20x50 cm (ml)', 1200),
+         ('Adoquín hexagonal 8 cm (m2)', 650)],
+        [('Block hueco 15x20x40', 9000), ('Block macizo 12x20x40', 1500)],
+        [('Tubo de concreto reforzado 90 cm x 2.5 m', 24),
+         ('Tubo de concreto simple 30 cm x 1.25 m', 80)],
+    ]
+    for lead, basket in zip(pre_leads, baskets):
+        act = lead.action_quote_prefab()
+        so = SO.browse(act['res_id'])
+        so.write({'order_line': [(0, 0, {'product_id': prefab[n].id,
+                                         'product_uom_qty': q})
+                                 for n, q in basket],
+                  'advance_pct': 30.0})
+        so.action_compute_prefab()
+
+    # Cotizaciones de concreto que muestran las reglas nuevas
+    prod = {}
+    for t in env['product.template'].search([('concrete_design_id', '!=', False)]):
+        prod[t.concrete_design_id.id] = t.product_variant_id
+    d250 = design('250')
+    cases = [
+        ('Cisterna particular (carga incompleta)', 2.0, zones[0], 0, False),
+        ('Losa con espera en obra', 14.0, zones[1], 150, True),
+        ('Firme nave Huejotzingo (zona +3%)', 42.0, zones[2], 60, True),
+    ]
+    for k, (obra, m3, zone, wait, ret) in enumerate(cases):
+        if not customers or d250.id not in prod:
+            break
+        so = SO.create({
+            'partner_id': customers[(k + 3) % len(customers)].id,
+            'concrete_obra': obra, 'concrete_design_id': d250.id,
+            'concrete_zone_id': zone.id, 'concrete_distance_km': zone.distance_km,
+            'concrete_wait_minutes': wait, 'freight_retention': ret,
+            'advance_pct': 50.0 if k else 100.0,
+            'concrete_pour_datetime': (now + timedelta(days=3 + k)).replace(
+                hour=8, minute=0, second=0),
+            'concrete_tma_option_id': env.ref('samblen_comercial.opt_tma_20').id
+            if env.ref('samblen_comercial.opt_tma_20', False) else False,
+            'order_line': [(0, 0, {'product_id': prod[d250.id].id,
+                                   'product_uom_qty': m3})]})
+        so.action_compute_charges()
+
+    # Agenda: fechas de colado en las órdenes de surtimiento
+    oscs = env['concrete.supply.order'].search([('date_pour', '=', False)],
+                                               order='id')
+    future = 0
+    for osc in oscs:
+        if osc.state in ('done', 'partial', 'dosing'):
+            start = osc.date_order.replace(hour=7, minute=30, second=0)
+        else:
+            future += 1
+            start = (now + timedelta(days=future)).replace(
+                hour=[7, 9, 11, 14][future % 4], minute=0, second=0)
+        osc.write({'date_pour': start,
+                   'date_pour_end': start + timedelta(hours=3)})
+        if osc.sale_order_id and not osc.sale_order_id.concrete_pour_datetime:
+            osc.sale_order_id.concrete_pour_datetime = start
+        if osc.state in ('draft', 'released'):
+            osc._notify_plant()
+    for d in env['concrete.delivery'].search([('date_load', '=', False),
+                                              ('order_id.date_pour', '!=', False)]):
+        d.date_load = d.order_id.date_pour + timedelta(minutes=40 * (d.olla - 1))
+
+    # Seguimiento del vendedor en cotizaciones enviadas o en borrador
+    act = env.ref('samblen_comercial.activity_quote_followup')
+    for so in env['sale.order'].search([('state', 'in', ('draft', 'sent'))]):
+        if not so.activity_ids.filtered(lambda a: a.activity_type_id == act):
+            so.activity_schedule(activity_type_id=act.id,
+                                 user_id=so.user_id.id or env.user.id,
+                                 date_deadline=today + timedelta(days=2),
+                                 summary='Dar seguimiento a la cotización')
+
+
 SECTIONS = [
     ('crm', ['crm.lead'], _crm),
+    ('comercial', ['samblen.commercial.zone', 'crm.lead'], _comercial),
     ('projects', ['project.project'], _projects),
     ('warehouses', ['stock.warehouse'], _warehouses),
     ('purchase', ['purchase.order'], _purchase),

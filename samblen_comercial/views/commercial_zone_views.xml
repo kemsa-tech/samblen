@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_commercial_zone_list" model="ir.ui.view">
+        <field name="name">samblen.commercial.zone.list</field>
+        <field name="model">samblen.commercial.zone</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="note"/>
+                <field name="distance_km"/>
+                <field name="price_adjust_pct"/>
+                <field name="pricelist_id"/>
+                <field name="active" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_commercial_zone" model="ir.actions.act_window">
+        <field name="name">Zonas comerciales</field>
+        <field name="res_model">samblen.commercial.zone</field>
+        <field name="view_mode">list</field>
+    </record>
+    <menuitem id="menu_commercial_zone" name="Zonas comerciales"
+              parent="sale.menu_sale_config" action="action_commercial_zone" sequence="93"/>
+</odoo>
