@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+<!-- Tarifas: noupdate para que una actualización del módulo no borre
+     los precios capturados por Samblen -->
+<data noupdate="1">
     <!-- Tarifas de ejemplo: ajustar con la cotización real de Samblen -->
     <record id="product_bombeo" model="product.template">
         <field name="name">Servicio de bombeo</field>
@@ -29,4 +32,5 @@
         <field name="list_price">1450.0</field>
         <field name="is_prefab">1</field>
     </record>
+</data>
 </odoo>

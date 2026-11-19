@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta
 
+import pytz
+
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
@@ -40,9 +42,13 @@ class CrmLead(models.Model):
     def action_schedule_visit(self):
         """Crea la cita de visita a obra en el calendario del vendedor."""
         self.ensure_one()
-        start = self.visit_datetime or (
-            fields.Datetime.now() + timedelta(days=1)).replace(
-                hour=16, minute=0, second=0)
+        start = self.visit_datetime
+        if not start:
+            # 10:00 hora local del usuario, guardado en UTC
+            local = fields.Datetime.context_timestamp(
+                self, fields.Datetime.now() + timedelta(days=1)).replace(
+                    hour=10, minute=0, second=0, microsecond=0)
+            start = local.astimezone(pytz.utc).replace(tzinfo=None)
         partners = (self.user_id.partner_id | self.partner_id).ids
         event = self.env['calendar.event'].create({
             'name': _('Visita a obra: %s') % (self.obra_name or self.name),

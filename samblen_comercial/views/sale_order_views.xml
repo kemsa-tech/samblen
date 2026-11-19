@@ -20,26 +20,31 @@
                         invisible="discount_state != 'pending'"
                         groups="samblen_comercial.group_discount_approver"/>
             </xpath>
-            <xpath expr="//field[@name='concrete_design_id']" position="before">
-                <field name="samblen_quote_type" widget="radio" options="{'horizontal': true}"/>
+            <!-- Datos de obra y concreto en la columna izquierda, bajo el cliente -->
+            <xpath expr="//group[@name='partner_details']" position="inside">
+                <field name="samblen_quote_type" widget="radio" options="{'horizontal': true}"
+                       string="Cotización de"/>
+                <field name="concrete_obra" position="move"/>
+                <field name="concrete_zone_id" options="{'no_create': True}"/>
+                <field name="concrete_distance_km" position="move"/>
+                <field name="concrete_design_id" position="move"/>
+                <field name="concrete_tipo" position="move"/>
+                <field name="discount_needs_approval" invisible="1"/>
+                <field name="discount_state" widget="badge"
+                       invisible="discount_state == 'none'"
+                       decoration-warning="discount_state == 'pending'"
+                       decoration-success="discount_state == 'approved'"
+                       decoration-danger="discount_state == 'rejected'"/>
             </xpath>
             <xpath expr="//field[@name='concrete_design_id']" position="attributes">
                 <attribute name="invisible">samblen_quote_type == 'prefab'</attribute>
+                <attribute name="string">Diseño / resistencia</attribute>
             </xpath>
             <xpath expr="//field[@name='concrete_tipo']" position="attributes">
                 <attribute name="invisible">samblen_quote_type == 'prefab'</attribute>
             </xpath>
-            <xpath expr="//field[@name='concrete_obra']" position="after">
-                <field name="concrete_zone_id" options="{'no_create': True}"/>
-            </xpath>
-            <xpath expr="//field[@name='concrete_tipo']" position="after">
-                <field name="max_line_discount"/>
-                <field name="discount_needs_approval" invisible="1"/>
-                <field name="discount_state" widget="badge"
-                       decoration-warning="discount_state == 'pending'"
-                       decoration-success="discount_state == 'approved'"
-                       decoration-danger="discount_state == 'rejected'"/>
-                <field name="discount_approver_id" invisible="not discount_approver_id"/>
+            <xpath expr="//field[@name='concrete_distance_km']" position="attributes">
+                <attribute name="string">Distancia (km)</attribute>
             </xpath>
             <xpath expr="//notebook" position="inside">
                 <page string="Cotizador de concreto" name="samblen_concrete"
@@ -73,13 +78,15 @@
                         y pulsa "Calcular cargos": se agrega el flete por viajes
                         y la fecha de entrega según existencias.</p>
                 </page>
-                <page string="Condiciones de pago" name="samblen_payment">
+                <page string="Pago y descuentos" name="samblen_payment">
                     <group>
                         <group>
                             <field name="advance_pct"/>
                             <field name="advance_amount"/>
                         </group>
                         <group>
+                            <field name="max_line_discount" string="Descuento mayor (%)"/>
+                            <field name="discount_approver_id" invisible="not discount_approver_id"/>
                             <field name="freight_retention"/>
                             <field name="retention_amount" invisible="not freight_retention"/>
                         </group>

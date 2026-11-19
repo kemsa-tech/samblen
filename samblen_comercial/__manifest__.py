@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Samblen Comercial',
-    'version': '19.0.1.2.0',
+    'version': '19.0.1.2.1',
     'category': 'Sales',
     'summary': 'Cotizador de concreto y prefabricados, CRM de obra y agenda de colados (Fase 1)',
     'description': """
